@@ -20,7 +20,7 @@ gfx.setColor(gfx.kColorWhite)
 
 -- Initialize animation for on-screen sprites
 local cat_spritesheet = gfx.imagetable.new("Minigames/bodega_cat/images/bc-cat")
-local cat = gfx.sprite.new(cat_spritesheet)
+local cat = gfx.sprite.new(cat_spritesheet:getImage(1))
 local cat_frame = math.random(1,4) -- set cat in random pose
 local pose = {"up", "down", "left", "right"}
 cat:setImage(cat_spritesheet:getImage(cat_frame))
@@ -108,7 +108,7 @@ function bodega_cat.update()
 		insta:moveTo(200, 120)
 		insta:add()
 		
-		cat = gfx.sprite.new(cat_spritesheet)
+		cat = gfx.sprite.new(cat_spritesheet:getImage(1))
 		cat:setImage(cat_spritesheet:getImage(cat_frame), playdate.graphics.kImageUnflipped, 0.5)
 		cat:moveTo(200, 120)
 		cat:add()
