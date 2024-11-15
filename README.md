@@ -10,6 +10,7 @@ Ahoy, mateys!
   git clone https://github.com/notpeter/playdate-luacats ../playdate-luacats
   ```
   Dit pad word gebruikt in `.luarc.json`
+- Je zou nu op F5 moeten kunnen drukken om te debuggen met breakpoints of gewoon runnen met ctrl-R 
 
 
 # mobware-minigames
