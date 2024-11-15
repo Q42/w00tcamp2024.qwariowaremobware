@@ -122,7 +122,7 @@ function playdate.update()
 			gfx.sprite.update() 
 			playdate.timer:updateTimers()
 			
-			mobware.print("mobware minigames")
+			mobware.print("QwarioWare")
 			
 			if playdate.buttonIsPressed("a") then 
 				

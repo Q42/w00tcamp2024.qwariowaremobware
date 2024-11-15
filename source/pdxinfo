@@ -1,8 +1,8 @@
-name=Mobware Minigames
-author=Drew Loebach
+name=QwarioWare
+author=q42
 description=crowd-developed minigame collection!
-bundleID=aloebach.minigames.mobware
-version=1.2
+bundleID=q42.qwarioware
+version=0.1
 imagePath=launcher/
 launchSoundPath=launcher/
 buildNumber=1034

@@ -109,9 +109,9 @@ function generate_credits()
 
 	-- Print our title: "MOBWARE MINIGAMES"
 	gfx.setFont(mobware_font_L)
-	local text_width, text_height = gfx.getTextSize("mobware minigames")
+	local text_width, text_height = gfx.getTextSize("QwarioWare")
 	local text_x = (400 - text_width) / 2 -- this should put the minigame name in the center of the screen
-	mobware.print("mobware minigames", text_x, credits_y)
+	mobware.print("QwarioWare", text_x, credits_y)
 	credits_y += SPACE_BETWEEN_CREDITS
 
 	-- Add animated sprite for metagame credits 
