@@ -10,7 +10,6 @@
 -- variables for use with testing/debugging:
 --DEBUG_GAME = "asheteroids" --> Set "DEBUG_GAME" variable to the name of a minigame and it'll be chosen every time!
 --SET_FRAME_RATE = 40 --> as the name implies will set a framerate. Used for testing minigames at various framerates
-UNLOCK_ALL_EXTRAS = true -- set this to true to have all extras unlocked!
 
 -- Import CoreLibs
 import "CoreLibs/object"
@@ -498,31 +497,7 @@ function playdate.upButtonDown() if minigame and minigame.upButtonDown then mini
 function playdate.upButtonUp() if minigame and minigame.upButtonUp then minigame.upButtonUp() end end
 
 sysMenu = playdate.getSystemMenu()
--- Add menu option to return to main menu
-sysMenu:addMenuItem(
-    'Main Game',
-    function()
-		if GameState ~= "menu" then
-			minigame = nil
-			_minigame_env = nil	
-			pcall(minigame_cleanup)
-			menu_initialized = nil
-        	GameState = "menu"
-		end
-    end
-)
 
--- Add menu option to view bonus content
-sysMenu:addMenuItem(
-	'bonus games',
-	function()
-		minigame = nil
-		_minigame_env = nil	
-		pcall(minigame_cleanup)
-		menu_initialized = nil
-		GameState = "bonus menu"
-	end
-)
 --[[
 -- Add menu option to view credits
 sysMenu:addMenuItem(
