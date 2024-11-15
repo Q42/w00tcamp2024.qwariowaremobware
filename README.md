@@ -1,3 +1,17 @@
+# QwarioWare
+Ahoy, mateys!
+
+## Setup
+- Extensions: Accepteer de popup om recommended plugins te installeren. Heb je die per ongeluk weggeklikt, gebruik dan de actie "Show Recommended extensions" of zoek in de extensions tab naar `@recommended`.
+- SDK Installeer de [Playdate SDK](https://play.date/dev/)
+- Code auto completion: Installeer (Playdate LuaCats)[https://github.com/notpeter/playdate-luacats]
+  naast dit project:
+  ```
+  git clone https://github.com/notpeter/playdate-luacats ../playdate-luacats
+  ```
+  Dit pad word gebruikt in `.luarc.json`
+
+
 # mobware-minigames
 Repo for Mobware Minigames for the Playdate!
 
