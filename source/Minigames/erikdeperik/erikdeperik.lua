@@ -6,31 +6,8 @@ local SPRITE_START_Y = 150
 local SPRITE_START_X = 50
 local SPRITE_END_X = 346
 local CRANKS_NEEDED = 10
-mobware.crankIndicator.start()
 
--- local smileWidth, smileHeight = 36, 36
--- local smileImage = gfx.image.new(smileWidth, smileHeight)
--- -- Pushing our new image to the graphics context, so everything
--- -- drawn will be drawn directly to the image
--- gfx.pushContext(smileImage)
---     -- => Indentation not required, but helps organize things!
---     gfx.setColor(gfx.kColorWhite)
---     -- Coordinates are based on the image being drawn into
---     -- (e.g. (x=0, y=0) refers to the top left of the image)
---     gfx.fillCircleInRect(0, 0, smileWidth, smileHeight)
---     gfx.setColor(gfx.kColorBlack)
---     -- Drawing the eyes
---     gfx.fillCircleAtPoint(11, 13, 3)
---     gfx.fillCircleAtPoint(25, 13, 3)
---     -- Drawing the mouth
---     gfx.setLineWidth(3
---     gfx.drawArc(smileWidth/2, smileHeight/2, 11, 115, 245)
---     -- Drawing the outline
---     gfx.setLineWidth(2)
---     gfx.setStrokeLocation(gfx.kStrokeInside)
---     gfx.drawCircleInRect(0, 0, smileWidth, smileHeight)
--- -- Popping context to stop drawing to image
--- gfx.popContext()
+mobware.crankIndicator.start()
 
 local backgroundImage = gfx.image.new( "Minigames/erikdeperik/images/jira_bg.png" )
 assert(backgroundImage, "Failed to load background image")
@@ -61,16 +38,22 @@ function erikdeperik.update()
 
 	-- Win condition:
 	if pd_sprite.done == true then
-		playdate.wait(1000)	-- Pause 1s before ending the minigame
+    local playdate_sprint_complete_image = gfx.image.new("Minigames/erikdeperik/images/sprint_complete.png")
+    local sprint_complete = gfx.sprite.new(playdate_sprint_complete_image)
+    sprint_complete:moveTo(200, 120)
+    sprint_complete:addSprite()
+    gfx.sprite.update()
+
+		playdate.wait(2000)	-- Pause 1s before ending the minigame
 		return 1
 	end
 
 	-- Loss condition
 	if gamestate == "defeat" then 
 		-- if player has lost, show images of playdate running out of power then exit
-		local playdate_low_battery_image = gfx.image.new("Minigames/hello_world/images/playdate_low_battery")
+		local playdate_low_battery_image = gfx.image.new("Minigames/erikdeperik/images/burndown.png")
 		local low_battery = gfx.sprite.new(playdate_low_battery_image)
-		low_battery:moveTo(150, 75)
+		low_battery:moveTo(200, 120)
 		low_battery:addSprite()
 		gfx.sprite.update() 
 
@@ -98,7 +81,12 @@ function erikdeperik.cranked(change, acceleratedChange)
 
   local sprite_x_pos = SPRITE_START_X + pd_sprite.crank_counter * move_speed
 
-  print("Change: ", change, "Crank Counter: ", pd_sprite.crank_counter, "Frame: ", pd_sprite.frame, "pos: ", sprite_x_pos)
+  -- Block moving to the left if the position of the sprite hasn't changed yet
+  if sprite_x_pos < SPRITE_START_X then
+    sprite_x_pos = SPRITE_START_X
+    pd_sprite.crank_counter = 0
+  end
+
   -- Move the sprite
   pd_sprite:moveTo(sprite_x_pos, SPRITE_START_Y)
 
