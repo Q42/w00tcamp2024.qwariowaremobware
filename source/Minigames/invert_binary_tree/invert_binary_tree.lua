@@ -47,6 +47,9 @@ title_sprite:add()
 local bg_sprite = gfx.sprite.new(gfx.image.new("Minigames/invert_binary_tree/images/invert_binary_tree_background"))
 bg_sprite:moveTo(200, 120)
 
+local rotation_sprite = gfx.sprite.new(gfx.image.new(10,10)) -- dummy image
+local unrotated_tree_image = nil
+
 local function createNumberObject(number)
 	local numberObject = {
 		val = number,
@@ -125,6 +128,16 @@ local function showBinaryTree()
 			value2.spr:add()
 		end
 	end
+end
+
+local function hideBinaryTree()
+	for index, value in ipairs(numberStates) do
+		for index2, value2 in ipairs(value) do
+			value2.spr:remove()
+		end
+	end
+	bg_sprite:remove()
+	selection_sprite:remove()
 end
 
 local function check_win()
@@ -261,9 +274,14 @@ function invert_binary_tree.cranked(change, acceleratedChange)
 	click_noise:play(1)
 
 	-- update sprite's frame so that the sprite will reflect the crank's actual position
-	local crank_position = playdate.getCrankPosition() -- Returns the absolute position of the crank (in degrees). Zero is pointing straight up parallel to the device
-	local frame_num = math.floor( crank_position / 45.1 + 1 ) -- adding .1 to fix bug that occurs if crank_position ~= 360
-	pd_sprite:setImage(playdate_image_table:getImage(frame_num))
+	-- local crank_position = playdate.getCrankPosition() -- Returns the absolute position of the crank (in degrees). Zero is pointing straight up parallel to the device
+	-- local frame_num = math.floor( crank_position / 45.1 + 1 ) -- adding .1 to fix bug that occurs if crank_position ~= 360
+	if gamestate == 'playing' then
+		gamestate = "cranking"
+		hideBinaryTree()
+		unrotated_tree_image = gfx.getDisplayImage()
+	end
+
 
 end
 
