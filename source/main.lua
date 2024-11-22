@@ -1,6 +1,6 @@
 --[[
 	MobWare Minigames
-	
+
 	Author: Andrew Loebach
 	loebach@gmail.com
 
@@ -8,7 +8,7 @@
 ]]
 
 -- variables for use with testing/debugging:
--- DEBUG_GAME = "jira" --> Set "DEBUG_GAME" variable to the name of a minigame and it'll be chosen every time!
+-- DEBUG_GAME = "minigame_kunstofweg" --> Set "DEBUG_GAME" variable to the name of a minigame and it'll be chosen every time!
 --SET_FRAME_RATE = 40 --> as the name implies will set a framerate. Used for testing minigames at various framerates
 
 -- Import CoreLibs
@@ -27,6 +27,7 @@ import "CoreLibs/easing"
 
 -- Import supporting libraries
 import 'lib/AnimatedSprite' --used to generate animations from spritesheet
+import 'lib/AnimatedImage' --used to generate animations from images
 import 'lib/mobware_ui'
 import 'lib/mobware_utilities'
 
@@ -38,6 +39,7 @@ local gfx <const> = playdate.graphics
 local ease <const> = playdate.easingFunctions
 
 --Define local variables to be used outside of the minigames
+local previous_game
 local GameState
 local minigame
 local unlockable_game
@@ -49,7 +51,7 @@ local lose_guage = 0;
 local max_lose_guage = 4
 local game_start_timer
 -- generate table of minigames and bonus games
-minigame_blocklist = {"hello_world"}
+minigame_blocklist = { "hello_world", "minigame_template" }
 minigame_list = generate_minigame_list("Minigames/", minigame_blocklist)
 local bonus_game_list, unlocked_bonus_games = generate_bonusgame_list("extras/")
 
@@ -100,6 +102,21 @@ function initialize_metagame()
 	gfx.setFont(mobware_default_font)
 end
 
+function getRandomGame()
+	local game_num = math.random(#minigame_list)
+
+	if previous_game == nil then
+		previous_game = game_num
+		return game_num
+	else
+		if game_num == previous_game then
+			getRandomGame()
+		else
+			return game_num
+		end
+	end
+end
+
 -- Call function to initialize and start game
 initialize_metagame()
 
@@ -125,7 +142,7 @@ function playdate.update()
 		else
 			-- Initialize the game's main menu
 
-			-- set background color to black		
+			-- set background color to black
 			set_black_background()
 
 			-- TO-DO: ONLY SHOW MENU INDICATOR IF THE PLAYER HAS UNLOCKED NEW GOODIES?
@@ -140,8 +157,8 @@ function playdate.update()
 		end
 	elseif GameState == 'initialize' then
 		-- Take a random game from our list of games, or take DEBUG_GAME if defined
-		local game_num = math.random(#minigame_list)
-		
+		local game_num = getRandomGame()
+
 		minigame_name = DEBUG_GAME or minigame_list[game_num]
 		local minigame_path = 'Minigames/' .. minigame_name .. '/' .. minigame_name -- build minigame file path
 
@@ -230,7 +247,7 @@ function playdate.update()
 				victory_music:setRate(music_rate)
 				victory_music:play(1) -- play victory theme
 				-- TODO replace with the man
-				-- demon_sprite:changeState("throwing")				
+				-- demon_sprite:changeState("throwing")
 			end
 		end
 	elseif GameState == 'transition' then
@@ -242,7 +259,7 @@ function playdate.update()
 		-- updates sprites
 		gfx.sprite.update()
 
-		-- display UI for transition		
+		-- display UI for transition
 		gfx.setFont(mobware_font_S)
 		mobware.print("score: " .. getScore(), 15, 20)
 		gfx.setFont(mobware_default_font) -- reset font to default
@@ -307,14 +324,18 @@ function playdate.update()
 	end
 
 	-- Added for debugging
-	--playdate.drawFPS()
+	playdate.drawFPS()
 end
 
 -- Callback functions for Playdate inputs:
 
 -- Callback functions for crank
-function playdate.cranked(change, acceleratedChange) if minigame and minigame.cranked then minigame.cranked(change,
-			acceleratedChange) end end
+function playdate.cranked(change, acceleratedChange)
+	if minigame and minigame.cranked then
+		minigame.cranked(change,
+			acceleratedChange)
+	end
+end
 
 function playdate.crankDocked() if minigame and minigame.crankDocked then minigame.crankDocked() end end
 
@@ -398,18 +419,18 @@ function set_poster_state()
 	if poster_complete_sprite == nil then
 		return
 	end
-	
+
 	-- If player has hit max losses, show final poster state
 	if lose_guage >= max_lose_guage then
 		poster_complete_sprite:changeState("lose-4")
 		return
 	end
-	
+
 	-- Calculate state based on lose_guage relative to max_lose_guage
 	local state = math.floor((lose_guage / max_lose_guage) * 4)
 	-- Clamp state between 0 and 4
 	state = math.max(0, math.min(4, state))
-	
+
 	poster_complete_sprite:changeState("lose-" .. state)
 end
 
@@ -419,7 +440,7 @@ end
 
 function onGameWon()
 	games_won = games_won + 1
-	
+
 	if lose_guage > 0 then
 		lose_guage = lose_guage - 1
 	end
