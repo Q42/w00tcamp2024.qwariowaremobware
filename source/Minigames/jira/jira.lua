@@ -1,4 +1,4 @@
-local erikdeperik = { }
+local jira = { }
 
 local gfx <const> = playdate.graphics
 
@@ -9,14 +9,14 @@ local CRANKS_NEEDED = 10
 
 mobware.crankIndicator.start()
 
-local backgroundImage = gfx.image.new( "Minigames/erikdeperik/images/jira_bg.png" )
+local backgroundImage = gfx.image.new( "Minigames/jira/images/jira_bg.png" )
 assert(backgroundImage, "Failed to load background image")
 gfx.sprite.setBackgroundDrawingCallback(
   function (x, y, width, height)
     backgroundImage:draw(0, 0)
   end
 )
-local ticketImage = gfx.image.new("Minigames/erikdeperik/images/ticket.png")
+local ticketImage = gfx.image.new("Minigames/jira/images/ticket.png")
 local pd_sprite = gfx.sprite.new(ticketImage)
 pd_sprite:moveTo(SPRITE_START_X, SPRITE_START_Y)
 pd_sprite:add()
@@ -29,7 +29,7 @@ local MAX_GAME_TIME = 5 -- define the time at 20 fps that the game will run betf
 local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, function() gamestate = "defeat" end )
 	--> after <MAX_GAME_TIME> seconds (at 20 fps) will move to "defeat" gamestate
 
-function erikdeperik.update()
+function jira.update()
 	-- update sprite animations
 	gfx.sprite.update() -- updates all sprites
 	
@@ -38,7 +38,7 @@ function erikdeperik.update()
 
 	-- Win condition:
 	if pd_sprite.done == true then
-    local playdate_sprint_complete_image = gfx.image.new("Minigames/erikdeperik/images/sprint_complete.png")
+    local playdate_sprint_complete_image = gfx.image.new("Minigames/jira/images/sprint_complete.png")
     local sprint_complete = gfx.sprite.new(playdate_sprint_complete_image)
     sprint_complete:moveTo(200, 120)
     sprint_complete:addSprite()
@@ -51,7 +51,7 @@ function erikdeperik.update()
 	-- Loss condition
 	if gamestate == "defeat" then 
 		-- if player has lost, show images of playdate running out of power then exit
-		local playdate_low_battery_image = gfx.image.new("Minigames/erikdeperik/images/burndown.png")
+		local playdate_low_battery_image = gfx.image.new("Minigames/jira/images/burndown.png")
 		local low_battery = gfx.sprite.new(playdate_low_battery_image)
 		low_battery:moveTo(200, 120)
 		low_battery:addSprite()
@@ -64,7 +64,7 @@ function erikdeperik.update()
 end
 
 
-function erikdeperik.cranked(change, acceleratedChange)
+function jira.cranked(change, acceleratedChange)
   -- display crank indicator
 	if mobware.crankIndicator then
 		mobware.crankIndicator.stop()
@@ -96,4 +96,4 @@ function erikdeperik.cranked(change, acceleratedChange)
   end
 end
 
-return erikdeperik
+return jira
