@@ -33,10 +33,6 @@ local invert_binary_tree = {}
 -- all of the code here will be run when the minigame is loaded, so here we'll initialize our graphics and variables:
 local gfx <const> = playdate.graphics
 
--- update sprite's frame so that the sprite will reflect the crank's actual position
-local crank_position = playdate.getCrankPosition() -- Returns the absolute position of the crank (in degrees). Zero is pointing straight up parallel to the device
-local frame_num = math.floor( crank_position / 45 + 1 )
-
 -- title image
 -- Load the title screen
 local title_sprite = gfx.sprite.new(gfx.image.new("Minigames/invert_binary_tree/images/invert_binary_tree_title"))
@@ -161,7 +157,7 @@ local gamestate = 'title'
 -- mobware.BbuttonIndicator.start()
 
 -- start timer	 
-local MAX_GAME_TIME = 600 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
+local MAX_GAME_TIME = 12 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
 local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, function() gamestate = "defeat" end ) --runs for 8 seconds at 20fps, and 4 seconds at 40fps
 	--> after <MAX_GAME_TIME> seconds (at 20 fps) will set "defeat" gamestate
 	--> I'm using the frame timer because that allows me to increase the framerate gradually to increase the difficulty of the minigame
@@ -253,17 +249,9 @@ function invert_binary_tree.update()
 
 
 	elseif gamestate == 'defeat' then
-
-		-- if player has lost, show images of playdate running out of power 
-		-- local playdate_low_battery_image = gfx.image.new("Minigames/invert_binary_tree/images/playdate_low_battery")
-		-- local low_battery = gfx.sprite.new(playdate_low_battery_image)
-		-- low_battery:moveTo(150, 75)
-		-- low_battery:addSprite()
-		-- gfx.sprite.update() 
-
-		-- -- wait another 2 seconds then exit
-		-- playdate.wait(2000)	-- Pause 2s before ending the minigame
-
+		mobware.print("JAMMER JOH",90, 70)
+		-- wait another 2 seconds then exit
+		playdate.wait(2000)	-- Pause 2s before ending the minigame
 		-- return 0 to indicate that the player has lost and exit the minigame 
 		return 0
 
