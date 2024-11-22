@@ -232,7 +232,11 @@ function invert_binary_tree.update()
 				selectedLevelIndex = 1
 			end
 		end
-
+	elseif gamestate == "cranking" then
+		local crank_angle = playdate.getCrankPosition() -- Returns the absolute position of the crank (in degrees). Zero is pointing straight up parallel to the device
+		local rotated_tree_image = unrotated_tree_image:rotatedImage(crank_angle)
+		rotation_sprite:setImage(rotated_tree_image)
+		-- rotation_sprite
 	elseif gamestate == 'victory' then
 		-- The "victory" gamestate will simply show the victory animation and then end the minigame
 
@@ -278,7 +282,13 @@ function invert_binary_tree.cranked(change, acceleratedChange)
 	-- local frame_num = math.floor( crank_position / 45.1 + 1 ) -- adding .1 to fix bug that occurs if crank_position ~= 360
 	if gamestate == 'playing' then
 		gamestate = "cranking"
+		-- get a screenshot of the current state without the selection_spritesheet
+		selection_sprite:remove()
+		gfx.sprite.update()
+		playdate.display.flush()
 		hideBinaryTree()
+		rotation_sprite:moveTo(200, 120)
+		rotation_sprite:add()
 		unrotated_tree_image = gfx.getDisplayImage()
 	end
 
