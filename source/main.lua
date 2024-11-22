@@ -46,10 +46,11 @@ local poster_complete_sprite
 local games_won = 0
 local games_lost = 0
 local lose_guage = 0;
-local max_lose_guage = 2
+local max_lose_guage = 4
 local game_start_timer
 -- generate table of minigames and bonus games
-minigame_list = generate_minigame_list("Minigames/")
+minigame_blocklist = {"hello_world"}
+minigame_list = generate_minigame_list("Minigames/", minigame_blocklist)
 local bonus_game_list, unlocked_bonus_games = generate_bonusgame_list("extras/")
 
 -- seed the RNG so that calls to random are always random
@@ -140,6 +141,7 @@ function playdate.update()
 	elseif GameState == 'initialize' then
 		-- Take a random game from our list of games, or take DEBUG_GAME if defined
 		local game_num = math.random(#minigame_list)
+		
 		minigame_name = DEBUG_GAME or minigame_list[game_num]
 		local minigame_path = 'Minigames/' .. minigame_name .. '/' .. minigame_name -- build minigame file path
 

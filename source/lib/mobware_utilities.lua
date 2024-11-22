@@ -3,7 +3,7 @@
 local gfx <const> = playdate.graphics
 
 -- generate table of minigames from directories found in the given path
-function generate_minigame_list(path)
+function generate_minigame_list(path, minigame_blocklist)
 
 	print("Generating minigame list:")
 
@@ -12,8 +12,22 @@ function generate_minigame_list(path)
 	for _i, minigame in ipairs(minigame_folders) do
 		if minigame:sub(#minigame,#minigame) == "/" then -- we check if the file is a directory
 			local minigame_name = minigame:sub(1, #minigame-1) -- removing trailing slash to get minigame name
-			print("adding", minigame_name, "to minigame list")
-			table.insert( minigame_list, minigame_name )
+			
+			-- Check if minigame is in blocklist before adding
+			local blocked = false
+			for _, blocked_game in ipairs(minigame_blocklist) do
+				if minigame_name == blocked_game then
+					blocked = true
+					break
+				end
+			end
+			
+			if not blocked then
+				print("adding", minigame_name, "to minigame list")
+				table.insert( minigame_list, minigame_name )
+			else
+				print("skipping blocked minigame:", minigame_name)
+			end
 		else
 			print("ERROR: ", minigame, "is not a directory. Ommitting from minigame list")
 		end
