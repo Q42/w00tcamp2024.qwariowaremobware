@@ -233,6 +233,7 @@ function invert_binary_tree.update()
 	elseif gamestate == "cranking" then
 		local crank_change = playdate.getCrankChange()
 		tree_image_angle = tree_image_angle + crank_change
+		tree_image_angle = tree_image_angle % 360
 		local rotated_tree_image = unrotated_tree_image:rotatedImage(tree_image_angle)
 		rotation_sprite:setImage(rotated_tree_image)
 		print("angle", "" .. tree_image_angle,  "crank_change" .. crank_change)
