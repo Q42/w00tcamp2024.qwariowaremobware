@@ -33,6 +33,13 @@ local invert_binary_tree = {}
 -- all of the code here will be run when the minigame is loaded, so here we'll initialize our graphics and variables:
 local gfx <const> = playdate.graphics
 
+<<<<<<< HEAD
+=======
+-- update sprite's frame so that the sprite will reflect the crank's actual position
+local crank_position = playdate.getCrankPosition() -- Returns the absolute position of the crank (in degrees). Zero is pointing straight up parallel to the device
+local frame_num = math.floor( crank_position / 45 + 1 )
+
+>>>>>>> origin/main
 -- title image
 -- Load the title screen
 local title_sprite = gfx.sprite.new(gfx.image.new("Minigames/invert_binary_tree/images/invert_binary_tree_title"))
