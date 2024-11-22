@@ -104,16 +104,11 @@ end
 
 function getRandomGame()
 	local game_num = math.random(#minigame_list)
-
-	if previous_game == nil then
-		previous_game = game_num
-		return game_num
+	if game_num == previous_game then
+		return getRandomGame()
 	else
-		if game_num == previous_game then
-			getRandomGame()
-		else
-			return game_num
-		end
+		previous_game = game_num	
+		return game_num
 	end
 end
 
