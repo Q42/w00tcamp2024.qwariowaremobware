@@ -39,6 +39,7 @@ local gfx <const> = playdate.graphics
 local ease <const> = playdate.easingFunctions
 
 --Define local variables to be used outside of the minigames
+local previous_game
 local GameState
 local minigame
 local unlockable_game
@@ -101,6 +102,21 @@ function initialize_metagame()
 	gfx.setFont(mobware_default_font)
 end
 
+function getRandomGame()
+	local game_num = math.random(#minigame_list)
+
+	if previous_game == nil then
+		previous_game = game_num
+		return game_num
+	else
+		if game_num == previous_game then
+			getRandomGame()
+		else
+			return game_num
+		end
+	end
+end
+
 -- Call function to initialize and start game
 initialize_metagame()
 
@@ -141,7 +157,7 @@ function playdate.update()
 		end
 	elseif GameState == 'initialize' then
 		-- Take a random game from our list of games, or take DEBUG_GAME if defined
-		local game_num = math.random(#minigame_list)
+		local game_num = getRandomGame()
 
 		minigame_name = DEBUG_GAME or minigame_list[game_num]
 		local minigame_path = 'Minigames/' .. minigame_name .. '/' .. minigame_name -- build minigame file path
