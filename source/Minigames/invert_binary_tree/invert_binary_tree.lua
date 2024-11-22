@@ -92,7 +92,6 @@ local selectedLevelIndex = 1
 -- selection_sprite:setZIndex(1)
 local selection_frames = gfx.imagetable.new("Minigames/invert_binary_tree/images/selection_borders")
 local selection_sprite = gfx.sprite.new(selection_frames:getImage(1))
-selection_sprite:add()
 selection_sprite:setZIndex(1)
 
 local function showBinaryTreeRow(states, center_x, level)
@@ -123,6 +122,7 @@ end
 
 local function showBinaryTree()
 	updateBinaryTree()
+	selection_sprite:add()
 	for index, value in ipairs(numberStates) do
 		for index2, value2 in ipairs(value) do
 			value2.spr:add()
@@ -186,7 +186,7 @@ function invert_binary_tree.update()
 
 	-- In the first stage of the minigame, the user needs to hit the "B" button
 	if gamestate == 'title' then
-		playdate.wait(100)
+		playdate.wait(1500)
 		title_sprite:remove()
 		bg_sprite:add()
 		updateBinaryTree()
@@ -203,7 +203,8 @@ function invert_binary_tree.update()
 
 			print("win?", check_win())
 			if(check_win()) then
-				return 1
+				updateBinaryTree()
+				gamestate = "victory"
 			end
 		elseif playdate.buttonJustPressed('down') then
 			print("down")
@@ -236,7 +237,10 @@ function invert_binary_tree.update()
 		local crank_angle = playdate.getCrankPosition() -- Returns the absolute position of the crank (in degrees). Zero is pointing straight up parallel to the device
 		local rotated_tree_image = unrotated_tree_image:rotatedImage(crank_angle)
 		rotation_sprite:setImage(rotated_tree_image)
-		-- rotation_sprite
+		print("angle", "" .. crank_angle)
+		if crank_angle > 170 and crank_angle < 190 then
+			gamestate = "victory"
+		end
 	elseif gamestate == 'victory' then
 		-- The "victory" gamestate will simply show the victory animation and then end the minigame
 
@@ -280,7 +284,7 @@ function invert_binary_tree.cranked(change, acceleratedChange)
 	-- update sprite's frame so that the sprite will reflect the crank's actual position
 	-- local crank_position = playdate.getCrankPosition() -- Returns the absolute position of the crank (in degrees). Zero is pointing straight up parallel to the device
 	-- local frame_num = math.floor( crank_position / 45.1 + 1 ) -- adding .1 to fix bug that occurs if crank_position ~= 360
-	if gamestate == 'playing' then
+	if gamestate == 'playing' and math.abs(playdate.getCrankChange()) > 5 then
 		gamestate = "cranking"
 		-- get a screenshot of the current state without the selection_spritesheet
 		selection_sprite:remove()
