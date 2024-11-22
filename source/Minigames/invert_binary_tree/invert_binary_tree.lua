@@ -91,6 +91,9 @@ local selection_frames = gfx.imagetable.new("Minigames/invert_binary_tree/images
 local selection_sprite = gfx.sprite.new(selection_frames:getImage(1))
 selection_sprite:setZIndex(1)
 
+mobware.timer.setPosition("bottomLeft")
+mobware.timer.sprite:add()
+
 local function showBinaryTreeRow(states, center_x, level)
 	local numSplits = 2 ^ (level-1)
 	local splitSpacing = 360 / numSplits
@@ -162,7 +165,8 @@ local gamestate = 'title'
 
 -- start timer	 
 local MAX_GAME_TIME = 12 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
-local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, function() gamestate = "defeat" end ) --runs for 8 seconds at 20fps, and 4 seconds at 40fps
+local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, 0.0, 1.0) --runs for 8 seconds at 20fps, and 4 seconds at 40fps
+game_timer.timerEndedCallback = function() gamestate = "defeat" end
 	--> after <MAX_GAME_TIME> seconds (at 20 fps) will set "defeat" gamestate
 	--> I'm using the frame timer because that allows me to increase the framerate gradually to increase the difficulty of the minigame
 
@@ -180,6 +184,8 @@ function invert_binary_tree.update()
 
 	-- update timer
 	playdate.frameTimer.updateTimers()
+
+	mobware.timer.setGameProgress(game_timer.value)
 
 	-- In the first stage of the minigame, the user needs to hit the "B" button
 	if gamestate == 'title' then
@@ -279,11 +285,13 @@ function invert_binary_tree.cranked(change, acceleratedChange)
 		gamestate = "cranking"
 		-- get a screenshot of the current state without the selection_spritesheet
 		selection_sprite:remove()
+		mobware.timer.sprite:remove()
 		gfx.sprite.update()
 		playdate.display.flush()
 		hideBinaryTree()
 		rotation_sprite:moveTo(200, 120)
 		rotation_sprite:add()
+		mobware.timer.sprite:add()
 		unrotated_tree_image = gfx.getDisplayImage()
 	end
 
