@@ -9,23 +9,6 @@
 ]]
 
 
---[[ NOTE: The following libraries are already imported in main.lua, so there's no need to define them in the minigame package
-import "CoreLibs/object"
-import "CoreLibs/graphics"
-import "CoreLibs/sprites"
-import "CoreLibs/timer"
-import "CoreLibs/frameTimer" 
-import "CoreLibs/nineslice"
-import "CoreLibs/ui"
-import "CoreLibs/crank"
-import "CoreLibs/easing"
-]]
-
--- Import any supporting libraries from minigame's folder
-	--> Note that all supporting files should be located in the minigame's directory "Minigames/make_the_button_bigger/" (or any subdirectory) 
---import 'Minigames/make_the_button_bigger/lib/AnimatedSprite' 
-
-
 -- Define name for minigame package -> should be the same name as the name of the folder and name of <minigame>.lua 
 local make_the_button_bigger = {}
 
@@ -68,12 +51,6 @@ game_timer.timerEndedCallback = function() gamestate = "defeat" end
 	--> I'm using the frame timer because that allows me to increase the framerate gradually to increase the difficulty of the minigame
 
 
---[[
-	function <minigame name>:update()
-
-	This function is what will be called every frame to run the minigame. 
-	NOTE: The main game will initially set the framerate to call this at 20 FPS to start, and will gradually speed up to 40 FPS
-]]
 function make_the_button_bigger.update()
 
 	-- updates all sprites
