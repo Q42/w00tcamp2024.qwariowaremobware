@@ -1,6 +1,6 @@
 
 --[[
-	Author: <your name here>
+	Author: Paul Kros
 
 	minigame_template for Mobware Minigames
 
