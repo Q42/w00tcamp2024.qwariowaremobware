@@ -1,50 +1,27 @@
-local erikdeperik = { }
+local jira = { }
 
 local gfx <const> = playdate.graphics
 
 local SPRITE_START_Y = 150
 local SPRITE_START_X = 50
 local SPRITE_END_X = 346
+local CRANKS_NEEDED = 10
+
 mobware.crankIndicator.start()
 
--- local smileWidth, smileHeight = 36, 36
--- local smileImage = gfx.image.new(smileWidth, smileHeight)
--- -- Pushing our new image to the graphics context, so everything
--- -- drawn will be drawn directly to the image
--- gfx.pushContext(smileImage)
---     -- => Indentation not required, but helps organize things!
---     gfx.setColor(gfx.kColorWhite)
---     -- Coordinates are based on the image being drawn into
---     -- (e.g. (x=0, y=0) refers to the top left of the image)
---     gfx.fillCircleInRect(0, 0, smileWidth, smileHeight)
---     gfx.setColor(gfx.kColorBlack)
---     -- Drawing the eyes
---     gfx.fillCircleAtPoint(11, 13, 3)
---     gfx.fillCircleAtPoint(25, 13, 3)
---     -- Drawing the mouth
---     gfx.setLineWidth(3
---     gfx.drawArc(smileWidth/2, smileHeight/2, 11, 115, 245)
---     -- Drawing the outline
---     gfx.setLineWidth(2)
---     gfx.setStrokeLocation(gfx.kStrokeInside)
---     gfx.drawCircleInRect(0, 0, smileWidth, smileHeight)
--- -- Popping context to stop drawing to image
--- gfx.popContext()
-
-local backgroundImage = gfx.image.new( "Minigames/erikdeperik/images/jira_bg.png" )
+local backgroundImage = gfx.image.new( "Minigames/jira/images/jira_bg.png" )
 assert(backgroundImage, "Failed to load background image")
 gfx.sprite.setBackgroundDrawingCallback(
   function (x, y, width, height)
     backgroundImage:draw(0, 0)
   end
 )
-local ticketImage = gfx.image.new("Minigames/erikdeperik/images/ticket.png")
+local ticketImage = gfx.image.new("Minigames/jira/images/ticket.png")
 local pd_sprite = gfx.sprite.new(ticketImage)
 pd_sprite:moveTo(SPRITE_START_X, SPRITE_START_Y)
 pd_sprite:add()
 pd_sprite.frame = 1
 pd_sprite.crank_counter = 0
-pd_sprite.total_frames = 16
 pd_sprite.done = false
 
 -- start timer 
@@ -52,7 +29,7 @@ local MAX_GAME_TIME = 5 -- define the time at 20 fps that the game will run betf
 local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, function() gamestate = "defeat" end )
 	--> after <MAX_GAME_TIME> seconds (at 20 fps) will move to "defeat" gamestate
 
-function erikdeperik.update()
+function jira.update()
 	-- update sprite animations
 	gfx.sprite.update() -- updates all sprites
 	
@@ -61,16 +38,22 @@ function erikdeperik.update()
 
 	-- Win condition:
 	if pd_sprite.done == true then
-		playdate.wait(1000)	-- Pause 1s before ending the minigame
+    local playdate_sprint_complete_image = gfx.image.new("Minigames/jira/images/sprint_complete.png")
+    local sprint_complete = gfx.sprite.new(playdate_sprint_complete_image)
+    sprint_complete:moveTo(200, 120)
+    sprint_complete:addSprite()
+    gfx.sprite.update()
+
+		playdate.wait(2000)	-- Pause 1s before ending the minigame
 		return 1
 	end
 
 	-- Loss condition
 	if gamestate == "defeat" then 
 		-- if player has lost, show images of playdate running out of power then exit
-		local playdate_low_battery_image = gfx.image.new("Minigames/hello_world/images/playdate_low_battery")
+		local playdate_low_battery_image = gfx.image.new("Minigames/jira/images/burndown.png")
 		local low_battery = gfx.sprite.new(playdate_low_battery_image)
-		low_battery:moveTo(150, 75)
+		low_battery:moveTo(200, 120)
 		low_battery:addSprite()
 		gfx.sprite.update() 
 
@@ -81,14 +64,13 @@ function erikdeperik.update()
 end
 
 
-function erikdeperik.cranked(change, acceleratedChange)
+function jira.cranked(change, acceleratedChange)
   -- display crank indicator
 	if mobware.crankIndicator then
 		mobware.crankIndicator.stop()
 	end
 
-  local cranks_needed = 7
-  local degrees_needed = cranks_needed * 360
+  local degrees_needed = CRANKS_NEEDED * 360
 
 	-- Increment animation counter:
 	pd_sprite.crank_counter = pd_sprite.crank_counter + change
@@ -99,7 +81,12 @@ function erikdeperik.cranked(change, acceleratedChange)
 
   local sprite_x_pos = SPRITE_START_X + pd_sprite.crank_counter * move_speed
 
-  print("Change: ", change, "Crank Counter: ", pd_sprite.crank_counter, "Frame: ", pd_sprite.frame, "pos: ", sprite_x_pos)
+  -- Block moving to the left if the position of the sprite hasn't changed yet
+  if sprite_x_pos < SPRITE_START_X then
+    sprite_x_pos = SPRITE_START_X
+    pd_sprite.crank_counter = 0
+  end
+
   -- Move the sprite
   pd_sprite:moveTo(sprite_x_pos, SPRITE_START_Y)
 
@@ -109,4 +96,4 @@ function erikdeperik.cranked(change, acceleratedChange)
   end
 end
 
-return erikdeperik
+return jira
