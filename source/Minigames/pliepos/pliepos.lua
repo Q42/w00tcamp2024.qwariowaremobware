@@ -27,32 +27,20 @@ import "CoreLibs/easing"
 
 
 -- Define name for minigame package -> should be the same name as the name of the folder and name of <minigame>.lua 
-local minigame_kunstofweg = {}
+local pliepos = {}
 
 
 -- all of the code here will be run when the minigame is loaded, so here we'll initialize our graphics and variables:
 local gfx <const> = playdate.graphics
 
--- animation for on-screen Playdate sprite
-local playdate_image_table = gfx.imagetable.new("Minigames/minigame_kunstofweg/images/playdate")
-local low_battery_image_table = gfx.imagetable.new("Minigames/minigame_kunstofweg/images/playdate_low_battery")
-local pd_sprite = gfx.sprite.new(image_table)
-
--- update sprite's frame so that the sprite will reflect the crank's actual position
-local crank_position = playdate.getCrankPosition() -- Returns the absolute position of the crank (in degrees). Zero is pointing straight up parallel to the device
-local frame_num = math.floor( crank_position / 45 + 1 )
-pd_sprite:setImage(playdate_image_table:getImage(frame_num))
-
-
-pd_sprite:moveTo(200, 120)
-pd_sprite:add()
-pd_sprite.frame = 1 
-pd_sprite.crank_counter = 0
-pd_sprite.total_frames = 16
-
-
 --> Initialize music / sound effects
-local click_noise = playdate.sound.sampleplayer.new('Minigames/minigame_kunstofweg/sounds/click')
+local coin1_noise = playdate.sound.sampleplayer.new('Minigames/pliepos/sounds/coin1')
+local coin2_noise = playdate.sound.sampleplayer.new('Minigames/pliepos/sounds/coin2')
+local coin3_noise = playdate.sound.sampleplayer.new('Minigames/pliepos/sounds/coin3')
+local coin4_noise = playdate.sound.sampleplayer.new('Minigames/pliepos/sounds/coin4')
+local coin5_noise = playdate.sound.sampleplayer.new('Minigames/pliepos/sounds/coin5')
+local coin6_noise = playdate.sound.sampleplayer.new('Minigames/pliepos/sounds/coin7')
+local coin7_noise = playdate.sound.sampleplayer.new('Minigames/pliepos/sounds/coin6')
 
 -- TO-DO: ADD VICTORY THEME
 --local victory_theme = playdate.sound.fileplayer.new('Minigames/TV_Tuner/sounds/static_noise')
@@ -63,7 +51,7 @@ mobware.BbuttonIndicator.start()
 
 -- start timer	 
 local MAX_GAME_TIME = 6 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
-local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, function() gamestate = "timeUp" end ) --runs for 8 seconds at 20fps, and 4 seconds at 40fps
+-- local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, function() gamestate = "timeUp" end ) --runs for 8 seconds at 20fps, and 4 seconds at 40fps
 	--> after <MAX_GAME_TIME> seconds (at 20 fps) will set "defeat" gamestate
 	--> I'm using the frame timer because that allows me to increase the framerate gradually to increase the difficulty of the minigame
 
@@ -78,16 +66,16 @@ local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, function() games
 local initialSetup = false
 local shuffledMap, shuffledKeys, path, firstKey, firstValue 
 
-function minigame_kunstofweg.update()
+function pliepos.update()
 	-- true is art, false is trash
-	if initialSetup == false then
-		shuffledMap, shuffledKeys = generateObjectMap()
-		firstKey, firstValue = getFirstEntry(shuffledMap, shuffledKeys)
-		local objectLowercased = string.lower(firstKey)
-		local objectNoSpaces = objectLowercased:gsub("%s+", "")
-		path = "Minigames/minigame_kunstofweg/images/".. objectNoSpaces .. ".png"
-		initialSetup = true
-	end
+	-- if initialSetup == false then
+	-- 	shuffledMap, shuffledKeys = generateObjectMap()
+	-- 	firstKey, firstValue = getFirstEntry(shuffledMap, shuffledKeys)
+	-- 	local objectLowercased = string.lower(firstKey)
+	-- 	local objectNoSpaces = objectLowercased:gsub("%s+", "")
+	-- 	path = "Minigames/minigame_kunstofweg/images/".. objectNoSpaces .. ".png"
+	-- 	initialSetup = true
+	-- end
 
 	-- updates all sprites
 	gfx.sprite.update() 
@@ -97,14 +85,27 @@ function minigame_kunstofweg.update()
 
 	-- In the first stage of the minigame, the user needs to hit the "B" button
 	if gamestate == 'start' then
-		local slack_ui_image = gfx.image.new("Minigames/minigame_kunstofweg/images/slackinterface.png")
-		local slack_ui = gfx.sprite.new(slack_ui_image)
-		local object_image = gfx.image.new(path)
-		local objectSprite = gfx.sprite.new(object_image)
-		slack_ui:moveTo(200, 120)
-		slack_ui:add()
-		objectSprite:moveTo(275, 100)
-		objectSprite:add()
+		local bg_path = "Minigames/pliepos/images/pliepos"
+		local background_image = gfx.image.new(bg_path)
+
+		if not background_image then
+		    error("Failed to load image: " + bg_path)
+		end
+
+		local background_sprite = gfx.sprite.new(background_image)
+		background_sprite:moveTo(200, 120)
+		background_sprite:add()
+
+		do
+			local kunstVal = "1 p = 3 c"
+			local message = string.format("%s", kunstVal)
+			printSign(message)
+		end
+
+		-- local object_image = gfx.image.new(path)
+		-- local objectSprite = gfx.sprite.new(object_image)
+		-- objectSprite:moveTo(275, 100)
+		-- objectSprite:add()
 		mobware.AbuttonIndicator.start()
 		mobware.BbuttonIndicator.start()
 
@@ -149,12 +150,23 @@ function minigame_kunstofweg.update()
 
 		end
 		local message = string.format("Het was %s", kunstVal)
-		mobware.print(message, 150, 120)
+		printSign(message, 150, 120)
 		playdate.wait(2000)	
 		return 0
 
 	end
 
+end
+
+function printSign(text)
+	
+	local text_width, text_height = gfx.getTextSize(text)
+	local centered_x = 291 - text_width / 2
+	local centered_y = 48 - text_height / 2
+	-- local draw_x = x or centered_x
+	-- local draw_y = y or centered_y
+	--text_box:setIgnoresDrawOffset(true)
+	gfx.drawTextAligned(text, centered_x, centered_y)
 end
 
 function generateObjectMap()
@@ -208,4 +220,4 @@ function getFirstFiveEntries(shuffledMap, keys)
     return firstFive
 end
 
-return minigame_kunstofweg
+return pliepos
