@@ -44,6 +44,9 @@ local title_sprite = gfx.sprite.new(gfx.image.new("Minigames/invert_binary_tree/
 title_sprite:moveTo(200, 120)
 title_sprite:add()
 
+local bg_sprite = gfx.sprite.new(gfx.image.new("Minigames/invert_binary_tree/images/invert_binary_tree_background"))
+bg_sprite:moveTo(200, 120)
+
 local function createNumberObject(number)
 	local numberObject = {
 		val = number,
@@ -67,7 +70,6 @@ local function showBinaryTreeRow(states, center_x, level)
 		if #states == 1 then
 			pos_x = center_x
 		end
-		print ("level", "" ..level, "index", index, "splitSpacing", splitSpacing, "pos_x", pos_x)
 		value.spr:moveTo(pos_x, y)
 	end
 end
@@ -97,7 +99,7 @@ local click_noise = playdate.sound.sampleplayer.new('Minigames/invert_binary_tre
 
 -- set initial gamestate and start prompt for player to hit the B button
 local gamestate = 'title'
-mobware.BbuttonIndicator.start()
+-- mobware.BbuttonIndicator.start()
 
 -- start timer	 
 local MAX_GAME_TIME = 600 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
@@ -124,11 +126,12 @@ function invert_binary_tree.update()
 	if gamestate == 'title' then
 		playdate.wait(100)
 		title_sprite:remove()
+		bg_sprite:add()
 		updateBinaryTree()
 		showBinaryTree()
 		gamestate = 'playing'
 	elseif gamestate == 'playing' then
-		
+		updateBinaryTree()
 
 	elseif gamestate == 'victory' then
 		-- The "victory" gamestate will simply show the victory animation and then end the minigame
