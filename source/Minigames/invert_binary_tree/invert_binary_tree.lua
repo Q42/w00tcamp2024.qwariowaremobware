@@ -189,6 +189,9 @@ function invert_binary_tree.update()
 			numberStates[selectedLevel][selectedLevelIndex + 1] = oldLeft
 
 			print("win?", check_win())
+			if(check_win()) then
+				return 1
+			end
 		elseif playdate.buttonJustPressed('down') then
 			print("down")
 			selectedLevel = selectedLevel + 1
