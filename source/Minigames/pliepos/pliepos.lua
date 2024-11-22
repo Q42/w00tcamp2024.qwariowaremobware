@@ -25,13 +25,22 @@ import "CoreLibs/easing"
 	--> Note that all supporting files should be located in the minigame's directory "Minigames/minigame_template/" (or any subdirectory) 
 --import 'Minigames/minigame_template/lib/AnimatedSprite' 
 
-
--- Define name for minigame package -> should be the same name as the name of the folder and name of <minigame>.lua 
-local pliepos = {}
-
+local function ternary(cond, T, F )
+    if cond then return T else return F end
+end
 
 -- all of the code here will be run when the minigame is loaded, so here we'll initialize our graphics and variables:
 local gfx <const> = playdate.graphics
+
+local function printSign(text)
+	local text_width, text_height = gfx.getTextSize(text)
+	local centered_x = 291 - text_width / 2
+	local centered_y = 48 - text_height / 2
+	gfx.drawTextAligned(text, centered_x, centered_y, kTextAlignment.center)
+end
+
+-- Define name for minigame package -> should be the same name as the name of the folder and name of <minigame>.lua 
+local pliepos = {}
 
 --> Initialize music / sound effects
 local coin1_noise = playdate.sound.sampleplayer.new('Minigames/pliepos/sounds/coin1')
@@ -47,7 +56,6 @@ local coin7_noise = playdate.sound.sampleplayer.new('Minigames/pliepos/sounds/co
 
 -- set initial gamestate and start prompt for player to hit the B button
 local gamestate = 'start'
-mobware.BbuttonIndicator.start()
 
 -- start timer	 
 local MAX_GAME_TIME = 6 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
@@ -66,67 +74,115 @@ local MAX_GAME_TIME = 6 -- define the time at 20 fps that the game will run betf
 local initialSetup = false
 local shuffledMap, shuffledKeys, path, firstKey, firstValue 
 
-function pliepos.update()
-	-- true is art, false is trash
-	-- if initialSetup == false then
-	-- 	shuffledMap, shuffledKeys = generateObjectMap()
-	-- 	firstKey, firstValue = getFirstEntry(shuffledMap, shuffledKeys)
-	-- 	local objectLowercased = string.lower(firstKey)
-	-- 	local objectNoSpaces = objectLowercased:gsub("%s+", "")
-	-- 	path = "Minigames/minigame_kunstofweg/images/".. objectNoSpaces .. ".png"
-	-- 	initialSetup = true
-	-- end
+local exchangePliepos = 0
+local exchangeCareokas = 0
+local offeredPliepos = 0
+local offeredCareokas = 0
 
+local pliepoSprites
+local careokaSprites
+
+function pliepos.setUp()
+    print("Setup called")
+
+	local bg_path = "Minigames/pliepos/images/pliepos"
+	local background_image = gfx.image.new(bg_path)
+	local background_sprite = gfx.sprite.new(background_image)
+	background_sprite:moveTo(200, 120)
+	background_sprite:add()
+
+	do
+		-- generate random int between 1 & 4
+		local randomInt = math.random(1, 3)
+		local randomInt2 = math.random(1, 2)
+		-- switch over the random int to play the corresponding sound
+		if randomInt == 1 then
+			exchangePliepos = 1
+			exchangeCareokas = 3
+			offeredPliepos = ternary(randomInt2 == 1, 2, 4)
+		elseif randomInt == 2 then
+			exchangePliepos = 1
+			exchangeCareokas = 4
+			offeredPliepos = ternary(randomInt2 == 1, 2, 3)
+		else 		
+			exchangePliepos = 2
+			exchangeCareokas = 3
+			offeredPliepos = ternary(randomInt2 == 1, 2, 4)
+		end
+	end
+
+	do
+		local message = string.format("%dP = %dC", exchangePliepos, exchangeCareokas)
+		printSign(message)
+		-- printSign("vert")
+	end
+
+	mobware.AbuttonIndicator.start()
+	mobware.BbuttonIndicator.start()
+end
+
+pliepos.setUp()
+
+function pliepos.update()
 	-- updates all sprites
 	gfx.sprite.update() 
 
 	-- update timer
 	playdate.frameTimer.updateTimers()
 
+	if playdate.buttonJustPressed(playdate.kButtonA) then
+		offeredCareokas += 1
+		print("offeredCareokas", offeredCareokas)
+
+		-- play random coin noise 
+		local randomInt = math.random(1, 7)
+		if randomInt == 1 then
+			coin1_noise:play()
+		elseif randomInt == 2 then
+			coin2_noise:play()
+		elseif randomInt == 3 then
+			coin3_noise:play()
+		elseif randomInt == 4 then
+			coin4_noise:play()
+		elseif randomInt == 5 then
+			coin5_noise:play()
+		elseif randomInt == 6 then
+			coin6_noise:play()
+		else
+			coin7_noise:play()
+		end
+	end
+
+	if playdate.buttonJustPressed(playdate.kButtonB) then
+		local expectedCareokas = (offeredPliepos / exchangePliepos) * exchangeCareokas
+		print("expected: ", expectedCareokas, "offeredCareokas", offeredCareokas)
+		if expectedCareokas == offeredCareokas then
+			gamestate = 'victory'
+		else
+			gamestate = 'defeat'
+		end
+	end
+
 	-- In the first stage of the minigame, the user needs to hit the "B" button
 	if gamestate == 'start' then
-		local bg_path = "Minigames/pliepos/images/pliepos"
-		local background_image = gfx.image.new(bg_path)
-
-		if not background_image then
-		    error("Failed to load image: " + bg_path)
-		end
-
-		local background_sprite = gfx.sprite.new(background_image)
-		background_sprite:moveTo(200, 120)
-		background_sprite:add()
-
-		do
-			local kunstVal = "1 p = 3 c"
-			local message = string.format("%s", kunstVal)
-			printSign(message)
-		end
-
-		-- local object_image = gfx.image.new(path)
-		-- local objectSprite = gfx.sprite.new(object_image)
-		-- objectSprite:moveTo(275, 100)
-		-- objectSprite:add()
-		mobware.AbuttonIndicator.start()
-		mobware.BbuttonIndicator.start()
-
-		if playdate.buttonIsPressed('a') then
-			if firstValue == true then
-				gamestate = 'defeat'
-			else
-				gamestate = 'victory'
-			end
-		elseif playdate.buttonIsPressed('b') then
-			if firstValue == false then
-				gamestate = 'defeat'
-			else
-				gamestate = 'victory'
-			end
-		end
+		-- if playdate.buttonIsPressed('a') then
+		-- 	if firstValue == true then
+		-- 		gamestate = 'defeat'
+		-- 	else
+		-- 		gamestate = 'victory'
+		-- 	end
+		-- elseif playdate.buttonIsPressed('b') then
+		-- 	if firstValue == false then
+		-- 		gamestate = 'defeat'
+		-- 	else
+		-- 		gamestate = 'victory'
+		-- 	end
+		-- end
 
 	elseif gamestate == 'victory' then
 		mobware.AbuttonIndicator.stop()
 		mobware.BbuttonIndicator.stop()
-		mobware.print("NICE",200, 120)
+		mobware.print("DANKJEWEL",200, 120)
 		playdate.wait(2000)
 		return 1
 
@@ -142,82 +198,11 @@ function pliepos.update()
 		mobware.AbuttonIndicator.stop()
 		mobware.BbuttonIndicator.stop()
 		gfx.sprite.update() 
-		local kunstVal
-		if firstValue == true then
-			kunstVal = "Kunst"
-		else
-			kunstVal = "Troep"
-
-		end
-		local message = string.format("Het was %s", kunstVal)
-		printSign(message, 150, 120)
+		local message = string.format("TE LAAT")
+		printSign(message)
 		playdate.wait(2000)	
 		return 0
-
 	end
-
-end
-
-function printSign(text)
-	
-	local text_width, text_height = gfx.getTextSize(text)
-	local centered_x = 291 - text_width / 2
-	local centered_y = 48 - text_height / 2
-	-- local draw_x = x or centered_x
-	-- local draw_y = y or centered_y
-	--text_box:setIgnoresDrawOffset(true)
-	gfx.drawTextAligned(text, centered_x, centered_y)
-end
-
-function generateObjectMap()
-    -- Define a table with string keys
-    local booleanMap = {
-        ["Kratje Pils"] = false,
-        ["Schoenen"] = false,
-        ["Wijnflessen"] = false,
-        ["Tafel"] = false,
-        ["Telefoons"] = false,
-        ["Zak Stiften"] = false,
-        ["Labelprinter"] = false,
-        ["Desktop"] = false,
-        ["PostIt"] = false,
-        ["Stapel Boeken"] = false,
-        ["Gitaar"] = false
-    }
-
-    -- Create a list of keys
-    local keys = {}
-    for key in pairs(booleanMap) do
-        table.insert(keys, key)
-    end
-
-    -- Shuffle the keys
-    for i = #keys, 2, -1 do
-        local j = math.random(i)
-        keys[i], keys[j] = keys[j], keys[i]
-    end
-
-    -- Create a new table with shuffled keys and random boolean values
-    local shuffledMap = {}
-    for _, key in ipairs(keys) do
-        shuffledMap[key] = math.random() > 0.5
-    end
-
-    return shuffledMap, keys
-end
-
-function getFirstEntry(shuffledMap, keys)
-    local firstKey = keys[1]
-    return firstKey, shuffledMap[firstKey]
-end
-
-function getFirstFiveEntries(shuffledMap, keys)
-    local firstFive = {}
-    for i = 1, math.min(5, #keys) do
-        local key = keys[i]
-        firstFive[key] = shuffledMap[key]
-    end
-    return firstFive
 end
 
 return pliepos
