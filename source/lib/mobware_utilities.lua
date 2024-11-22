@@ -121,3 +121,8 @@ function set_black_background()
 	gfx.setColor(gfx.kColorWhite)
 end
 
+function set_white_background()
+	-- set background color to white
+	gfx.setBackgroundColor(gfx.kColorWhite)
+	gfx.setColor(gfx.kColorBlack)
+end
