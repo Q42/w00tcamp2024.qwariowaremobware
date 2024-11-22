@@ -58,10 +58,8 @@ numberStates[2] =  { createNumberObject(2), createNumberObject(3) }
 numberStates[3] =  { createNumberObject(4), createNumberObject(5), createNumberObject(6), createNumberObject(7) }
 
 local function showBinaryTreeRow(states, center_x, level)
-	local spacing = 400 / (level)
 	local numSplits = 2 ^ (level-1)
 	local splitSpacing = 360 / numSplits
-	local halfSpacing = splitSpacing / 2
 	local y = 25 + (level - 1) * 70
 	for index, value in ipairs(states) do
 		-- local pos_x = center_x - halfSpacing + spacing * (index - 1 ) -- + 0 if index 1, + spacing if index 2
@@ -76,8 +74,6 @@ end
 
 local function updateBinaryTree()
 	for level, value in ipairs(numberStates) do
-		local numSplits = 2 ^ (level-1)
-		local splitSpacing = 200 / numSplits
 		showBinaryTreeRow(value, 200 , level) -- todo centerPoint
 	end
 end
