@@ -153,10 +153,6 @@ local function check_win()
 end
 
 
-
---> Initialize music / sound effects
-local click_noise = playdate.sound.sampleplayer.new('Minigames/invert_binary_tree/sounds/click')
-
 -- TO-DO: ADD VICTORY THEME
 --local victory_theme = playdate.sound.fileplayer.new('Minigames/TV_Tuner/sounds/static_noise')
 
