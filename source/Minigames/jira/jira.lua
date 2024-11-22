@@ -5,7 +5,7 @@ local gfx <const> = playdate.graphics
 local SPRITE_START_Y = 150
 local SPRITE_START_X = 50
 local SPRITE_END_X = 346
-local CRANKS_NEEDED = 5
+local CRANKS_NEEDED = 4
 
 mobware.crankIndicator.start()
 
