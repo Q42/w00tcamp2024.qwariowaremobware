@@ -71,6 +71,31 @@ playdate.frameTimer.new( MAX_GAME_TIME * 20, function() gamestate = "timeUp" end
 
 local initialSetup = false
 local shuffledMap, shuffledKeys, path, firstKey, firstValue, shuffledFirstFive
+local messageSprites = {}
+local typeSprites = {}
+local backgroundImage = nil
+
+local function initializeSprites()
+    -- Pre-load all message and type sprites
+	backgroundImage = gfx.image.new("Minigames/minigame_kunstofweg/images/slackinterface.png")
+	assert(backgroundImage, "Failed to load background image")
+	gfx.sprite.setBackgroundDrawingCallback(function()
+		backgroundImage:draw(0, 0)
+	end)
+    for key, _ in pairs(shuffledMap) do
+        local messagePath = "Minigames/minigame_kunstofweg/images/textSprites/" .. key .. "text.png"
+        local messageSprite = gfx.sprite.new(gfx.image.new(messagePath))
+        messageSprites[key] = messageSprite
+        
+        -- Create both kunst and weg sprites for each item
+        local wegSprite = gfx.sprite.new(gfx.image.new("Minigames/minigame_kunstofweg/images/weg.png"))
+        local kunstSprite = gfx.sprite.new(gfx.image.new("Minigames/minigame_kunstofweg/images/kunst.png"))
+        typeSprites[key] = {
+            [false] = wegSprite,
+            [true] = kunstSprite
+        }
+    end
+end
 
 function minigame_kunstofweg.update()
 	playdate.frameTimer.updateTimers()
@@ -80,22 +105,23 @@ function minigame_kunstofweg.update()
 		firstKey, firstValue = getFirstEntry(shuffledMap, shuffledKeys)
 		path = "Minigames/minigame_kunstofweg/images/objectSprites/".. firstKey .. ".png"
         shuffledFirstFive = getFirstFiveEntriesShuffled(shuffledMap, shuffledKeys)
-		displaySprites(shuffledFirstFive)
+		initializeSprites()
 		mobware.AbuttonIndicator.start()
 		mobware.BbuttonIndicator.start()
 		initialSetup = true
 	end
+	
 	-- updates all sprites
-	gfx.sprite.update()
+	gfx.sprite.update() 
+
+	displaySprites(shuffledFirstFive)
+	-- update timer
+	playdate.frameTimer.updateTimers()
 
 	-- In the first stage of the minigame, the user needs to hit the "B" button
 	if gamestate == 'start' then
-		local slack_ui_image = gfx.image.new("Minigames/minigame_kunstofweg/images/slackinterface.png")
-		local slack_ui = gfx.sprite.new(slack_ui_image)
 		local object_image = gfx.image.new(path)
 		local objectSprite = gfx.sprite.new(object_image)
-		slack_ui:moveTo(200, 120)
-		slack_ui:add()
 		objectSprite:moveTo(275, 100)
 		objectSprite:add()
 
@@ -151,34 +177,18 @@ end
 
 function displaySprites(fiveRandomValues)
     local yOffset = 0
-    local yOffsetIncrement = 40 -- Adjust this value to control the vertical spacing between sprites
+    local yOffsetIncrement = 40
 
     for key, value in pairs(fiveRandomValues) do
-        -- Construct the message path using the key
-        local messagePath = "Minigames/minigame_kunstofweg/images/textSprites/" .. key .. "text.png"
-        local messageImage = gfx.image.new(messagePath)
-        local messageSprite = gfx.sprite.new(messageImage)
+        local messageSprite = messageSprites[key]
+        local typeSprite = typeSprites[key][value]
 
-        -- Determine the type path based on the value
-        local typePath
-        if value == false then
-            typePath = "Minigames/minigame_kunstofweg/images/weg.png"
-        else
-            typePath = "Minigames/minigame_kunstofweg/images/kunst.png"
-        end
-
-        local typeImage = gfx.image.new(typePath)
-        local typeSprite = gfx.sprite.new(typeImage)
-
-        -- Move sprites to their respective positions with offset
         messageSprite:moveTo(70, 30 + yOffset)
-        typeSprite:moveTo(115, 30 + yOffset) -- Adjust the x and y positions as needed
+        typeSprite:moveTo(115, 30 + yOffset)
 
-        -- Add sprites to the display
         messageSprite:add()
         typeSprite:add()
 
-        -- Increment the offset for the next pair of sprites
         yOffset = yOffset + yOffsetIncrement
     end
 end

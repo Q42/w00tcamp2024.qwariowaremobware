@@ -50,7 +50,7 @@ local lose_guage = 0;
 local max_lose_guage = 4
 local game_start_timer
 -- generate table of minigames and bonus games
-minigame_blocklist = { "hello_world" }
+minigame_blocklist = { "hello_world", "minigame_template" }
 minigame_list = generate_minigame_list("Minigames/", minigame_blocklist)
 local bonus_game_list, unlocked_bonus_games = generate_bonusgame_list("extras/")
 
