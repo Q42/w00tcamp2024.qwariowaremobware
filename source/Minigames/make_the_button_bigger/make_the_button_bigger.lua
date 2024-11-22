@@ -23,9 +23,6 @@ local title_sprite = gfx.sprite.new(gfx.image.new("Minigames/make_the_button_big
 title_sprite:moveTo(200, 120)
 title_sprite:add()
 
-local bg_sprite = gfx.sprite.new(gfx.image.new("Minigames/make_the_button_bigger/images/make_the_button_bigger_background"))
-bg_sprite:moveTo(200, 120)
-
 local button_sale = 1.0
 local button_target_scale = 1.0 -- will be set when transitioning to playing state
 local button_sprite = gfx.sprite.new(gfx.image.new("Minigames/make_the_button_bigger/images/button_buy"))
@@ -65,7 +62,6 @@ function make_the_button_bigger.update()
 	if gamestate == 'title' then
 		playdate.wait(1500)
 		title_sprite:remove()
-		bg_sprite:add()
 		gamestate = 'playing'
 		button_sprite:add()
 		button_outline_sprite:add()
