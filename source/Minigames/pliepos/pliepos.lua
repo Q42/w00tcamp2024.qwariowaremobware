@@ -1,11 +1,6 @@
 
 --[[
-	Author: <your name here>
-
-	minigame_template for Mobware Minigames
-
-	feel free to search and replace "minigame_template" in this code with your minigame's name,
-	rename the file <your_minigame>.lua, and rename the folder to the same name to get started on your own minigame!
+	Author: Edwin Veger
 ]]
 
 
@@ -36,7 +31,7 @@ local function printSign(text)
 	local text_width, text_height = gfx.getTextSize(text)
 	local centered_x = 291 - text_width / 2
 	local centered_y = 48 - text_height / 2
-	gfx.drawTextAligned(text, centered_x, centered_y, kTextAlignment.center)
+	gfx.drawTextAligned(text, centered_x, centered_y, kTextAlignment.left)
 end
 
 -- Define name for minigame package -> should be the same name as the name of the folder and name of <minigame>.lua 
@@ -58,21 +53,10 @@ local coin7_noise = playdate.sound.sampleplayer.new('Minigames/pliepos/sounds/co
 local gamestate = 'start'
 
 -- start timer	 
-local MAX_GAME_TIME = 6 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
+local MAX_GAME_TIME = 10 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
 -- local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, function() gamestate = "timeUp" end ) --runs for 8 seconds at 20fps, and 4 seconds at 40fps
 	--> after <MAX_GAME_TIME> seconds (at 20 fps) will set "defeat" gamestate
 	--> I'm using the frame timer because that allows me to increase the framerate gradually to increase the difficulty of the minigame
-
-
---[[
-	function <minigame name>:update()
-
-	This function is what will be called every frame to run the minigame. 
-	NOTE: The main game will initially set the framerate to call this at 20 FPS to start, and will gradually speed up to 40 FPS
-]]
-
-local initialSetup = false
-local shuffledMap, shuffledKeys, path, firstKey, firstValue 
 
 local exchangePliepos = 0
 local exchangeCareokas = 0
@@ -82,8 +66,40 @@ local offeredCareokas = 0
 local pliepoSprites
 local careokaSprites
 
+local function addPliepoSprite(index)
+	local path = "Minigames/pliepos/images/pliepos_coin_p"
+	local image = gfx.image.new(path)
+	local sprite = gfx.sprite.new(image)
+
+	local x = 32 + math.random(0, 70)
+	local y = 120 + math.random(0, 70)
+
+	sprite:setZIndex(y)
+	sprite:moveTo(x, y)
+	sprite:add()
+end
+
+local function addPliepoSprites()
+	for i = 1, offeredPliepos do
+		addPliepoSprite(i)
+	end
+end
+
+local function addCareokaSprite()
+	local path = "Minigames/pliepos/images/pliepos_coin_c"
+	local image = gfx.image.new(path)
+	local sprite = gfx.sprite.new(image)
+
+	local x = 300 + math.random(-20, 70)
+	local y = 110 + math.random(0, 60)
+
+	sprite:setZIndex(y)
+	sprite:moveTo(x, y)
+	sprite:add()
+end
+
 function pliepos.setUp()
-    print("Setup called")
+    print("setUp called.")
 
 	local bg_path = "Minigames/pliepos/images/pliepos"
 	local background_image = gfx.image.new(bg_path)
@@ -109,12 +125,8 @@ function pliepos.setUp()
 			exchangeCareokas = 3
 			offeredPliepos = ternary(randomInt2 == 1, 2, 4)
 		end
-	end
 
-	do
-		local message = string.format("%dP = %dC", exchangePliepos, exchangeCareokas)
-		printSign(message)
-		-- printSign("vert")
+		addPliepoSprites()
 	end
 
 	mobware.AbuttonIndicator.start()
@@ -127,12 +139,21 @@ function pliepos.update()
 	-- updates all sprites
 	gfx.sprite.update() 
 
+	do
+		local message = string.format("%dP = %dC", exchangePliepos, exchangeCareokas)
+		print(message)
+		print("some euqla", exchangePliepos, exchangeCareokas)
+		printSign(message)
+		-- printSign("vert")
+	end
+
 	-- update timer
 	playdate.frameTimer.updateTimers()
 
 	if playdate.buttonJustPressed(playdate.kButtonA) then
 		offeredCareokas += 1
-		print("offeredCareokas", offeredCareokas)
+		addCareokaSprite()
+		print("offeredCareokas", offeredCareokas)		
 
 		-- play random coin noise 
 		local randomInt = math.random(1, 7)
@@ -165,19 +186,6 @@ function pliepos.update()
 
 	-- In the first stage of the minigame, the user needs to hit the "B" button
 	if gamestate == 'start' then
-		-- if playdate.buttonIsPressed('a') then
-		-- 	if firstValue == true then
-		-- 		gamestate = 'defeat'
-		-- 	else
-		-- 		gamestate = 'victory'
-		-- 	end
-		-- elseif playdate.buttonIsPressed('b') then
-		-- 	if firstValue == false then
-		-- 		gamestate = 'defeat'
-		-- 	else
-		-- 		gamestate = 'victory'
-		-- 	end
-		-- end
 
 	elseif gamestate == 'victory' then
 		mobware.AbuttonIndicator.stop()
