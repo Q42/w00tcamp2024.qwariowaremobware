@@ -60,9 +60,24 @@ numberStates[1] =  { createNumberObject(1) }
 numberStates[2] =  { createNumberObject(2), createNumberObject(3) }
 numberStates[3] =  { createNumberObject(4), createNumberObject(5), createNumberObject(6), createNumberObject(7) }
 
+local selectedLevel = 1
+local selectedLevelIndex = 1
+
+-- local selection_spritesheet = gfx.imagetable.new("Minigames/invert_binary_tree/images/selection_borders")
+-- local selection_sprite = AnimatedSprite.new( selection_spritesheet )
+-- selection_sprite:playAnimation()
+-- selection_sprite:pauseAnimation()
+-- selection_sprite:frame_num(1)
+-- selection_sprite:setZIndex(1)
+local selection_frames = gfx.imagetable.new("Minigames/invert_binary_tree/images/selection_borders")
+local selection_sprite = gfx.sprite.new(selection_frames:getImage(1))
+selection_sprite:add()
+selection_sprite:setZIndex(1)
+
 local function showBinaryTreeRow(states, center_x, level)
 	local numSplits = 2 ^ (level-1)
 	local splitSpacing = 360 / numSplits
+	local halfSpacing = splitSpacing / 2
 	local y = 25 + (level - 1) * 70
 	for index, value in ipairs(states) do
 		-- local pos_x = center_x - halfSpacing + spacing * (index - 1 ) -- + 0 if index 1, + spacing if index 2
@@ -71,6 +86,10 @@ local function showBinaryTreeRow(states, center_x, level)
 			pos_x = center_x
 		end
 		value.spr:moveTo(pos_x, y)
+		if selectedLevel == level and selectedLevelIndex == index then
+			selection_sprite:setImage(selection_frames:getImage(level))
+			selection_sprite:moveTo(pos_x + halfSpacing, y)
+		end
 	end
 end
 
@@ -132,6 +151,19 @@ function invert_binary_tree.update()
 		gamestate = 'playing'
 	elseif gamestate == 'playing' then
 		updateBinaryTree()
+		if playdate.buttonJustPressed('down') then
+			print("down")
+			selectedLevel = selectedLevel + 1
+			if selectedLevel > #numberStates then
+				selectedLevel = 1
+			end
+		elseif playdate.buttonJustPressed('up') then
+			print("up")
+			selectedLevel = selectedLevel - 1
+			if selectedLevel < 1 then
+				selectedLevel = #numberStates
+			end
+		end
 
 	elseif gamestate == 'victory' then
 		-- The "victory" gamestate will simply show the victory animation and then end the minigame
