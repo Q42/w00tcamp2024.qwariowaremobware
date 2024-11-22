@@ -5,6 +5,7 @@ local gfx <const> = playdate.graphics
 local SPRITE_START_Y = 150
 local SPRITE_START_X = 50
 local SPRITE_END_X = 346
+local CRANKS_NEEDED = 10
 mobware.crankIndicator.start()
 
 -- local smileWidth, smileHeight = 36, 36
@@ -44,7 +45,6 @@ pd_sprite:moveTo(SPRITE_START_X, SPRITE_START_Y)
 pd_sprite:add()
 pd_sprite.frame = 1
 pd_sprite.crank_counter = 0
-pd_sprite.total_frames = 16
 pd_sprite.done = false
 
 -- start timer 
@@ -87,8 +87,7 @@ function erikdeperik.cranked(change, acceleratedChange)
 		mobware.crankIndicator.stop()
 	end
 
-  local cranks_needed = 7
-  local degrees_needed = cranks_needed * 360
+  local degrees_needed = CRANKS_NEEDED * 360
 
 	-- Increment animation counter:
 	pd_sprite.crank_counter = pd_sprite.crank_counter + change
