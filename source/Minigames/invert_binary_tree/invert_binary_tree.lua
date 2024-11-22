@@ -60,6 +60,22 @@ numberStates[1] =  { createNumberObject(1) }
 numberStates[2] =  { createNumberObject(2), createNumberObject(3) }
 numberStates[3] =  { createNumberObject(4), createNumberObject(5), createNumberObject(6), createNumberObject(7) }
 
+local function reverse(tab)
+	for i = 1, #tab//2, 1 do
+			tab[i], tab[#tab-i+1] = tab[#tab-i+1], tab[i]
+	end
+	return tab
+end
+
+local targetStates = table.deepcopy(numberStates)
+for level, value in ipairs(targetStates) do
+	targetStates[level] = reverse(value)
+end
+print ("numberStates")
+printTable(numberStates)
+
+print("targetStates")
+printTable(targetStates)
 
 
 local selectedLevel = 1
@@ -111,6 +127,17 @@ local function showBinaryTree()
 	end
 end
 
+local function check_win()
+	for level, value in ipairs(numberStates) do
+		for index, value2 in ipairs(value) do
+			if value2.val ~= targetStates[level][index].val then
+				return false
+			end
+		end
+	end
+	return true
+end
+
 
 
 --> Initialize music / sound effects
@@ -160,6 +187,8 @@ function invert_binary_tree.update()
 			local oldRight = numberStates[selectedLevel][selectedLevelIndex + 1]
 			numberStates[selectedLevel][selectedLevelIndex] = oldRight
 			numberStates[selectedLevel][selectedLevelIndex + 1] = oldLeft
+
+			print("win?", check_win())
 		elseif playdate.buttonJustPressed('down') then
 			print("down")
 			selectedLevel = selectedLevel + 1
@@ -176,13 +205,13 @@ function invert_binary_tree.update()
 			selectedLevelIndex = 1
 		elseif playdate.buttonJustPressed('left') then
 			print("left")
-			selectedLevelIndex = selectedLevelIndex - 2
+			selectedLevelIndex = selectedLevelIndex - 1
 			if selectedLevelIndex < 1 then
 				selectedLevelIndex = 1
 			end
 		elseif playdate.buttonJustPressed('right') then
 			print("right")
-			selectedLevelIndex = selectedLevelIndex + 2 -- to the next pair
+			selectedLevelIndex = selectedLevelIndex + 1 -- to the next pair
 			if selectedLevelIndex >= #numberStates[selectedLevel] then
 				selectedLevelIndex = 1
 			end
