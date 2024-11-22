@@ -18,7 +18,7 @@ import "CoreLibs/easing"
 
 -- Import any supporting libraries from minigame's folder
 	--> Note that all supporting files should be located in the minigame's directory "Minigames/minigame_template/" (or any subdirectory) 
---import 'Minigames/minigame_template/lib/AnimatedSprite' 
+-- import 'lib/AnimatedSprite' 
 
 local function ternary(cond, T, F )
     if cond then return T else return F end
@@ -27,10 +27,29 @@ end
 -- all of the code here will be run when the minigame is loaded, so here we'll initialize our graphics and variables:
 local gfx <const> = playdate.graphics
 
+local function makeCustomButton(name)
+	local path
+
+	if name == 'plusOne' then
+		path = "Minigames/pliepos/images/button-plus-one"
+	elseif name == 'ok' then
+		path = "Minigames/pliepos/images/button-ok"
+	else 
+		assert(false, "Invalid button name")
+	end
+
+	local spritesheet = gfx.imagetable.new(path)
+	local sprite = AnimatedSprite.new(spritesheet)
+	sprite:addState("mash",1,6, {tickStep = 2}, true)
+	sprite:setZIndex(1000)
+	sprite:setIgnoresDrawOffset(true)
+	return sprite
+end
+
 local function printSign(text)
 	local text_width, text_height = gfx.getTextSize(text)
-	local centered_x = 291 - text_width / 2
-	local centered_y = 48 - text_height / 2
+	local centered_x = 200 - text_width / 2
+	local centered_y = 32 - text_height / 2
 	gfx.drawTextAligned(text, centered_x, centered_y, kTextAlignment.left)
 end
 
@@ -63,8 +82,8 @@ local exchangeCareokas = 0
 local offeredPliepos = 0
 local offeredCareokas = 0
 
-local pliepoSprites
-local careokaSprites
+local plusOneButton = makeCustomButton('plusOne')
+local okButton = makeCustomButton('ok')
 
 local function addPliepoSprite(index)
 	local path = "Minigames/pliepos/images/pliepos_coin_p"
@@ -107,6 +126,9 @@ function pliepos.setUp()
 	background_sprite:moveTo(200, 120)
 	background_sprite:add()
 
+	okButton:moveTo(275,205)
+	plusOneButton:moveTo(364,205)
+
 	do
 		-- generate random int between 1 & 4
 		local randomInt = math.random(1, 3)
@@ -128,9 +150,6 @@ function pliepos.setUp()
 
 		addPliepoSprites()
 	end
-
-	mobware.AbuttonIndicator.start()
-	mobware.BbuttonIndicator.start()
 end
 
 pliepos.setUp()
@@ -140,11 +159,10 @@ function pliepos.update()
 	gfx.sprite.update() 
 
 	do
-		local message = string.format("%dP = %dC", exchangePliepos, exchangeCareokas)
-		print(message)
-		print("some euqla", exchangePliepos, exchangeCareokas)
+		local plie = ternary(exchangePliepos == 1, "pliepo", "pliepo's")
+		local car = ternary(exchangeCareokas == 1, "careoka", "careoka's")
+		local message = string.format("%d %s = %d %s", exchangePliepos, plie, exchangeCareokas, car)
 		printSign(message)
-		-- printSign("vert")
 	end
 
 	-- update timer
@@ -184,27 +202,25 @@ function pliepos.update()
 		end
 	end
 
-	-- In the first stage of the minigame, the user needs to hit the "B" button
 	if gamestate == 'start' then
+	else 
+		plusOneButton:remove()
+		okButton:remove()
+	end 
 
+	if gamestate == 'start' then
 	elseif gamestate == 'victory' then
-		mobware.AbuttonIndicator.stop()
-		mobware.BbuttonIndicator.stop()
 		mobware.print("DANKJEWEL",200, 120)
 		playdate.wait(2000)
 		return 1
 
 	elseif gamestate == 'defeat' then
-		mobware.AbuttonIndicator.stop()
-		mobware.BbuttonIndicator.stop()
 		gfx.sprite.update() 
 		mobware.print("FOUT",200, 120)
 		playdate.wait(2000)	
 		return 0
 
 	elseif gamestate == 'timeUp' then
-		mobware.AbuttonIndicator.stop()
-		mobware.BbuttonIndicator.stop()
 		gfx.sprite.update() 
 		local message = string.format("TE LAAT")
 		printSign(message)
