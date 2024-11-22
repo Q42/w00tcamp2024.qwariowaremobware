@@ -55,24 +55,30 @@ end
 local numberStates = {}
 numberStates[1] =  { createNumberObject(1) }
 numberStates[2] =  { createNumberObject(2), createNumberObject(3) }
-
-local testNumberObject = createNumberObject(1337)
-testNumberObject.spr:moveTo(100, 50)
-testNumberObject.spr:add()
+numberStates[3] =  { createNumberObject(4), createNumberObject(5), createNumberObject(6), createNumberObject(7) }
 
 local function showBinaryTreeRow(states, center_x, level)
-	local spacing = 100  - 20 * level
-	local halfSpacing = spacing / 2
-	local y = 20 + level * 80
+	local spacing = 400 / (level)
+	local numSplits = 2 ^ (level-1)
+	local splitSpacing = 360 / numSplits
+	local halfSpacing = splitSpacing / 2
+	local y = 25 + (level - 1) * 70
 	for index, value in ipairs(states) do
-		local pos_x = center_x - halfSpacing + spacing * (index - 1 ) -- + 0 if index 1, + spacing if index 2
+		-- local pos_x = center_x - halfSpacing + spacing * (index - 1 ) -- + 0 if index 1, + spacing if index 2
+		local pos_x = 200 - (#states/2 - 0.5) * splitSpacing + (index - 1) * splitSpacing
+		if #states == 1 then
+			pos_x = center_x
+		end
+		print ("level", "" ..level, "index", index, "splitSpacing", splitSpacing, "pos_x", pos_x)
 		value.spr:moveTo(pos_x, y)
 	end
 end
 
 local function updateBinaryTree()
-	for index, value in ipairs(numberStates) do
-		showBinaryTreeRow(value, 200, index) -- todo centerPoint
+	for level, value in ipairs(numberStates) do
+		local numSplits = 2 ^ (level-1)
+		local splitSpacing = 200 / numSplits
+		showBinaryTreeRow(value, 200 , level) -- todo centerPoint
 	end
 end
 
@@ -120,7 +126,7 @@ function invert_binary_tree.update()
 
 	-- In the first stage of the minigame, the user needs to hit the "B" button
 	if gamestate == 'title' then
-		playdate.wait(1000)
+		playdate.wait(100)
 		title_sprite:remove()
 		updateBinaryTree()
 		showBinaryTree()
