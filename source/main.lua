@@ -8,7 +8,7 @@
 ]]
 
 -- variables for use with testing/debugging:
--- DEBUG_GAME = "jira" --> Set "DEBUG_GAME" variable to the name of a minigame and it'll be chosen every time!
+-- DEBUG_GAME = "minigame_kunstofweg" --> Set "DEBUG_GAME" variable to the name of a minigame and it'll be chosen every time!
 --SET_FRAME_RATE = 40 --> as the name implies will set a framerate. Used for testing minigames at various framerates
 
 -- Import CoreLibs
@@ -51,7 +51,7 @@ local lose_guage = 0;
 local max_lose_guage = 4
 local game_start_timer
 -- generate table of minigames and bonus games
-minigame_blocklist = { "hello_world" }
+minigame_blocklist = { "hello_world", "minigame_template" }
 minigame_list = generate_minigame_list("Minigames/", minigame_blocklist)
 local bonus_game_list, unlocked_bonus_games = generate_bonusgame_list("extras/")
 
@@ -324,7 +324,7 @@ function playdate.update()
 	end
 
 	-- Added for debugging
-	--playdate.drawFPS()
+	playdate.drawFPS()
 end
 
 -- Callback functions for Playdate inputs:
