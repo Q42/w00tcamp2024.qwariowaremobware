@@ -25,7 +25,7 @@ pd_sprite.crank_counter = 0
 pd_sprite.total_frames = 16
 
 -- start timer 
-local MAX_GAME_TIME = 6 -- define the time at 20 fps that the game will run betfore setting the "defeat" gamestate
+local MAX_GAME_TIME = 1 -- define the time at 20 fps that the game will run betfore setting the "defeat" gamestate
 local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, function() gamestate = "defeat" end ) 
 	--> after <MAX_GAME_TIME> seconds (at 20 fps) will move to "defeat" gamestate
 
@@ -36,6 +36,11 @@ function hello_world.update()
 	
 	-- update frame timer
 	playdate.frameTimer.updateTimers()
+	-- win if the player presses the A button
+	if playdate.buttonJustPressed("a") then
+		playdate.wait(1000)	-- Pause 1s before ending the minigame
+		return 1
+	end
 
 	-- Win condition:
 	if pd_sprite.frame == pd_sprite.total_frames then
@@ -56,6 +61,7 @@ function hello_world.update()
 		playdate.wait(2000)	-- Pause 2s before ending the minigame
 		return 0 -- returning 0 to indicate that the player has lost and exit the minigame 
 	end
+	
 
 end
 
