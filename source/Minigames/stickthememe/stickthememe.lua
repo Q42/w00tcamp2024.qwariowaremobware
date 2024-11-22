@@ -69,6 +69,7 @@ function stickthememe.setUp()
 	local randomInt = math.random(3)
 	local bg_path = "Minigames/stickthememe/images/backgrounds/" .. randomInt .. ".png"
 	local background_image = gfx.image.new(bg_path)
+	mobware.AbuttonIndicator.start()
 
 
 	assert(background_image, "Failed to load background image")
@@ -107,17 +108,20 @@ function stickthememe.update()
 
 	if gamestate == 'start' then
 	elseif gamestate == 'victory' then
+		mobware.AbuttonIndicator.stop()
 		mobware.print("Lekkâh bezag!",200, 120)
 		playdate.wait(2000)
 		return 1
 
 	elseif gamestate == 'defeat' then
+		mobware.AbuttonIndicator.stop()
 		gfx.sprite.update() 
 		mobware.print("Jè scheve!",200, 120)
 		playdate.wait(2000)	
 		return 0
 
 	elseif gamestate == 'timeUp' then
+		mobware.AbuttonIndicator.stop()
 		gfx.sprite.update() 
 		mobware.print("Je mot plakke hè?")
 		playdate.wait(2000)	
