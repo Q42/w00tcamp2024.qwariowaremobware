@@ -43,7 +43,7 @@ local stickthememe = {}
 local gamestate = 'start'
 
 -- start timer	 
-local MAX_GAME_TIME = 20 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
+local MAX_GAME_TIME = 8 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
 local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, function() gamestate = "timeUp" end ) --runs for 8 seconds at 20fps, and 4 seconds at 40fps
 	--> after <MAX_GAME_TIME> seconds (at 20 fps) will set "defeat" gamestate
 	--> I'm using the frame timer because that allows me to increase the framerate gradually to increase the difficulty of the minigame
@@ -60,10 +60,10 @@ local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, function() games
 	local thumb_sprite = gfx.sprite.new(thumb_image)
 	local miem_image = gfx.image.new(miemPath)
 	local miem_sprite = gfx.sprite.new(miem_image)
-	local x = 100
 	local y = 280
 	local miemYOffset = 86
 	local miemXOffset = 76
+	local stickitSound = snd.sampleplayer.new("Minigames/stickthememe/sounds/stickit.wav")
 
 function stickthememe.setUp()
 	local randomInt = math.random(3)
@@ -81,33 +81,62 @@ function stickthememe.setUp()
 	backgroundMusic:play(0)
 end
 
+local x = -100
+local currentTime = 0
+
+-- Randomly decide the direction of progression
+local isAscending = math.random() > 0.5 -- true for -100 to 300, false for 300 to -100
+
+-- Set up the timer with an updateCallback
+local game_timer = playdate.frameTimer.new(MAX_GAME_TIME * 20, function() gamestate = "timeUp" end)
+
+-- Define the updateCallback to update the value based on the timer's progress
+game_timer.updateCallback = function(timer)
+    currentTime = currentTime + 1
+
+    -- Calculate the progress as a fraction of the total duration
+    local progress = currentTime / timer.duration
+
+    -- Calculate x based on the progress and the direction
+    if isAscending then
+        x = -100 + (progress * 400) -- Ascending from -100 to 300
+    else
+        x = 300 - (progress * 400) -- Descending from 300 to -100
+    end
+end
+
 stickthememe.setUp()
 
 function stickthememe.update()
+	hand_sprite:setCenter(0,1)
+	hand_sprite:moveTo(x, y)
+	hand_sprite:add()
+
+	miem_sprite:setCenter(0,1)
+	miem_sprite:moveTo(x + miemXOffset, y - miemYOffset)
+	miem_sprite:add()
+
+	thumb_sprite:setCenter(0,1)
+	thumb_sprite:moveTo(x, y)
+	thumb_sprite:add()
 	-- updates all sprites
 	gfx.sprite.update() 
 
 	-- update timer
 	playdate.frameTimer.updateTimers()
 
-
-
 	if gamestate == 'start' then
-		hand_sprite:setCenter(0,1)
-		hand_sprite:moveTo(x, y)
-		hand_sprite:add()
+		if playdate.buttonIsPressed('a') then
+			stickitSound:play(1)
+			if x >= 52 and x <= 122 then
+				gamestate = 'victory'
+			else
+				gamestate = 'victory'
+			end
+		end
+	end
 
-		miem_sprite:setCenter(0,1)
-		miem_sprite:moveTo(x + miemXOffset, y - miemYOffset)
-		miem_sprite:add()
-
-		thumb_sprite:setCenter(0,1)
-		thumb_sprite:moveTo(x, y)
-		thumb_sprite:add()
-	end 
-
-	if gamestate == 'start' then
-	elseif gamestate == 'victory' then
+	if gamestate == 'victory' then
 		mobware.AbuttonIndicator.stop()
 		mobware.print("Lekkâh bezag!",200, 120)
 		playdate.wait(2000)
