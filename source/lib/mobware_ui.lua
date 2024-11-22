@@ -168,18 +168,38 @@ end
 
 
 
---WORK IN PROGRESS!!!
--- Timer indicator
+-- Q Timer indicator
+local q_timer_spritesheet = gfx.imagetable.new("images/q-timer")
 mobware.timer = {}
---local timer_spritesheet = gfx.imagetable.new("images/timer")
-function mobware.timer.start()
-	timer = playdate.timer.new(8000)
+mobware.timer.defaultZIndex = 1000
+mobware.timer.sprite = gfx.sprite.new(q_timer_spritesheet:getImage(1))
+mobware.timer.sprite:setZIndex(1000)
+function mobware.timer.setGameProgress(progress)
+	local frameIdx = progress * q_timer_spritesheet:getLength()
+	-- clamp frameIdx to the length of the spritesheet
+	frameIdx = math.min(frameIdx, q_timer_spritesheet:getLength())
+	frameIdx = math.max(frameIdx, 1)
+	frameIdx = math.floor(frameIdx)
+	mobware.timer.sprite:setImage(q_timer_spritesheet:getImage(frameIdx))
 end
 
-function mobware.timer.stop()
-	timer:remove()
+function mobware.timer.setPosition(pos)
+	if pos == "topLeft" then
+		mobware.timer.sprite:moveTo(18, 10)
+	elseif pos == "topRight" then
+		mobware.timer.sprite:moveTo(381, 26)
+	elseif pos == "bottomLeft" then
+		mobware.timer.sprite:moveTo(18, 215)
+	elseif pos == "bottomRight" then
+		mobware.timer.sprite:moveTo(381, 215)
+	end
 end
 
+function mobware.timer.reset()
+	mobware.timer.setPosition("bottomLeft")
+	mobware.timer.sprite:setImage(q_timer_spritesheet:getImage(1))
+	mobware.timer.sprite:setZIndex(mobware.timer.defaultZIndex)
+end
 
 -- initialize text box used for mobware.print
 local text_box = gfx.nineSlice.new("images/text-bubble", 16, 16, 32, 32)
