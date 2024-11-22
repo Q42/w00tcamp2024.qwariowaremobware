@@ -49,6 +49,7 @@ bg_sprite:moveTo(200, 120)
 
 local rotation_sprite = gfx.sprite.new(gfx.image.new(10,10)) -- dummy image
 local unrotated_tree_image = nil
+local tree_image_angle = 0.0
 
 local function createNumberObject(number)
 	local numberObject = {
@@ -234,11 +235,13 @@ function invert_binary_tree.update()
 			end
 		end
 	elseif gamestate == "cranking" then
-		local crank_angle = playdate.getCrankPosition() -- Returns the absolute position of the crank (in degrees). Zero is pointing straight up parallel to the device
-		local rotated_tree_image = unrotated_tree_image:rotatedImage(crank_angle)
+		local crank_change = playdate.getCrankChange()
+		tree_image_angle = tree_image_angle + crank_change
+		local rotated_tree_image = unrotated_tree_image:rotatedImage(tree_image_angle)
 		rotation_sprite:setImage(rotated_tree_image)
-		print("angle", "" .. crank_angle)
-		if crank_angle > 170 and crank_angle < 190 then
+		print("angle", "" .. tree_image_angle,  "crank_change" .. crank_change)
+		local abs_tree_image_angle = math.abs(tree_image_angle)
+		if abs_tree_image_angle > 175 and abs_tree_image_angle < 185 then
 			gamestate = "victory"
 		end
 	elseif gamestate == 'victory' then
@@ -279,7 +282,6 @@ end
 ]]
 function invert_binary_tree.cranked(change, acceleratedChange)
 	-- When crank is turned, play clicking noise
-	click_noise:play(1)
 
 	-- update sprite's frame so that the sprite will reflect the crank's actual position
 	-- local crank_position = playdate.getCrankPosition() -- Returns the absolute position of the crank (in degrees). Zero is pointing straight up parallel to the device
