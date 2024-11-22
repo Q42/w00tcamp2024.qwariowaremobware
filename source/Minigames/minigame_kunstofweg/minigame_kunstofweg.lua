@@ -35,8 +35,6 @@ local gfx <const> = playdate.graphics
 local snd = playdate.sound
 
 -- animation for on-screen Playdate sprite
-local playdate_image_table = gfx.imagetable.new("Minigames/minigame_kunstofweg/images/playdate")
-local low_battery_image_table = gfx.imagetable.new("Minigames/minigame_kunstofweg/images/playdate_low_battery")
 local pd_sprite = gfx.sprite.new(image_table)
 
 pd_sprite:moveTo(200, 120)
@@ -48,7 +46,7 @@ pd_sprite.total_frames = 16
 
 --> Initialize music / sound free-sound-effects
 local backgroundMusic = snd.sampleplayer.new("Minigames/minigame_kunstofweg/sounds/clowntheme.wav")
-backgroundMusic:play()
+backgroundMusic:play(0)
 
 -- TO-DO: ADD VICTORY THEME
 --local victory_theme = playdate.sound.fileplayer.new('Minigames/TV_Tuner/sounds/static_noise')
@@ -59,7 +57,7 @@ mobware.BbuttonIndicator.start()
 
 -- start timer	 
 local MAX_GAME_TIME = 6 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
-local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, function() gamestate = "timeUp" end ) --runs for 8 seconds at 20fps, and 4 seconds at 40fps
+playdate.frameTimer.new( MAX_GAME_TIME * 20, function() gamestate = "timeUp" end ) --runs for 8 seconds at 20fps, and 4 seconds at 40fps
 	--> after <MAX_GAME_TIME> seconds (at 20 fps) will set "defeat" gamestate
 	--> I'm using the frame timer because that allows me to increase the framerate gradually to increase the difficulty of the minigame
 
@@ -75,20 +73,20 @@ local initialSetup = false
 local shuffledMap, shuffledKeys, path, firstKey, firstValue, shuffledFirstFive
 
 function minigame_kunstofweg.update()
+	playdate.frameTimer.updateTimers()
 	-- true is art, false is trash
 	if initialSetup == false then
 		shuffledMap, shuffledKeys = generateObjectMap()
 		firstKey, firstValue = getFirstEntry(shuffledMap, shuffledKeys)
 		path = "Minigames/minigame_kunstofweg/images/objectSprites/".. firstKey .. ".png"
         shuffledFirstFive = getFirstFiveEntriesShuffled(shuffledMap, shuffledKeys)
+		displaySprites(shuffledFirstFive)
+		mobware.AbuttonIndicator.start()
+		mobware.BbuttonIndicator.start()
 		initialSetup = true
 	end
-
 	-- updates all sprites
-	gfx.sprite.update() 
-
-	-- update timer
-	playdate.frameTimer.updateTimers()
+	gfx.sprite.update()
 
 	-- In the first stage of the minigame, the user needs to hit the "B" button
 	if gamestate == 'start' then
@@ -100,9 +98,6 @@ function minigame_kunstofweg.update()
 		slack_ui:add()
 		objectSprite:moveTo(275, 100)
 		objectSprite:add()
-		displaySprites(shuffledFirstFive)
-		mobware.AbuttonIndicator.start()
-		mobware.BbuttonIndicator.start()
 
 
 		if playdate.buttonIsPressed('a') then
@@ -120,8 +115,6 @@ function minigame_kunstofweg.update()
 		end
 
 	elseif gamestate == 'victory' then
-		mobware.AbuttonIndicator.stop()
-		mobware.BbuttonIndicator.stop()
 		mobware.print("NICE",200, 120)
 		local niceSound = snd.sampleplayer.new("Minigames/minigame_kunstofweg/sounds/nice.wav")
 		niceSound:play(1)
@@ -129,8 +122,6 @@ function minigame_kunstofweg.update()
 		return 1
 
 	elseif gamestate == 'defeat' then
-		mobware.AbuttonIndicator.stop()
-		mobware.BbuttonIndicator.stop()
 		gfx.sprite.update() 
 		mobware.print("FOUT",200, 120)
 		local foutSound = snd.sampleplayer.new("Minigames/minigame_kunstofweg/sounds/fout.wav")
@@ -139,8 +130,6 @@ function minigame_kunstofweg.update()
 		return 0
 
 	elseif gamestate == 'timeUp' then
-		mobware.AbuttonIndicator.stop()
-		mobware.BbuttonIndicator.stop()
 		gfx.sprite.update() 
 		local message
 		if firstValue == true then
