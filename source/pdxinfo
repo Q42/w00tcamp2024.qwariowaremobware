@@ -1,7 +1,7 @@
 name=QwarioWare
 author=q42
 description=crowd-developed minigame collection!
-bundleID=q42.qwarioware
+bundleID=nl.q42.qwarioware
 version=0.1
 imagePath=launcher/
 launchSoundPath=launcher/
