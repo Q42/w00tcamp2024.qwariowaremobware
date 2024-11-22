@@ -152,17 +152,37 @@ function invert_binary_tree.update()
 		gamestate = 'playing'
 	elseif gamestate == 'playing' then
 		updateBinaryTree()
-		if playdate.buttonJustPressed('down') then
+		if playdate.buttonJustPressed('a') then
+			print("a")
+			local oldLeft = numberStates[selectedLevel][selectedLevelIndex]
+			local oldRight = numberStates[selectedLevel][selectedLevelIndex + 1]
+			numberStates[selectedLevel][selectedLevelIndex] = oldRight
+			numberStates[selectedLevel][selectedLevelIndex + 1] = oldLeft
+		elseif playdate.buttonJustPressed('down') then
 			print("down")
 			selectedLevel = selectedLevel + 1
 			if selectedLevel > #numberStates then
 				selectedLevel = 1
 			end
+			selectedLevelIndex = 1
 		elseif playdate.buttonJustPressed('up') then
 			print("up")
 			selectedLevel = selectedLevel - 1
 			if selectedLevel < 1 then
 				selectedLevel = #numberStates
+			end
+			selectedLevelIndex = 1
+		elseif playdate.buttonJustPressed('left') then
+			print("left")
+			selectedLevelIndex = selectedLevelIndex - 2
+			if selectedLevelIndex < 1 then
+				selectedLevelIndex = 1
+			end
+		elseif playdate.buttonJustPressed('right') then
+			print("right")
+			selectedLevelIndex = selectedLevelIndex + 2 -- to the next pair
+			if selectedLevelIndex >= #numberStates[selectedLevel] then
+				selectedLevelIndex = 1
 			end
 		end
 
