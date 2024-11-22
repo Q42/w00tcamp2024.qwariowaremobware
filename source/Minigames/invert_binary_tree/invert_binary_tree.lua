@@ -60,6 +60,8 @@ numberStates[1] =  { createNumberObject(1) }
 numberStates[2] =  { createNumberObject(2), createNumberObject(3) }
 numberStates[3] =  { createNumberObject(4), createNumberObject(5), createNumberObject(6), createNumberObject(7) }
 
+
+
 local selectedLevel = 1
 local selectedLevelIndex = 1
 
