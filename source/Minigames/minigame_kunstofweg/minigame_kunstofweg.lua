@@ -32,17 +32,12 @@ local minigame_kunstofweg = {}
 
 -- all of the code here will be run when the minigame is loaded, so here we'll initialize our graphics and variables:
 local gfx <const> = playdate.graphics
+local snd = playdate.sound
 
 -- animation for on-screen Playdate sprite
 local playdate_image_table = gfx.imagetable.new("Minigames/minigame_kunstofweg/images/playdate")
 local low_battery_image_table = gfx.imagetable.new("Minigames/minigame_kunstofweg/images/playdate_low_battery")
 local pd_sprite = gfx.sprite.new(image_table)
-
--- update sprite's frame so that the sprite will reflect the crank's actual position
-local crank_position = playdate.getCrankPosition() -- Returns the absolute position of the crank (in degrees). Zero is pointing straight up parallel to the device
-local frame_num = math.floor( crank_position / 45 + 1 )
-pd_sprite:setImage(playdate_image_table:getImage(frame_num))
-
 
 pd_sprite:moveTo(200, 120)
 pd_sprite:add()
@@ -51,8 +46,9 @@ pd_sprite.crank_counter = 0
 pd_sprite.total_frames = 16
 
 
---> Initialize music / sound effects
-local click_noise = playdate.sound.sampleplayer.new('Minigames/minigame_kunstofweg/sounds/click')
+--> Initialize music / sound free-sound-effects
+local backgroundMusic = snd.sampleplayer.new("Minigames/minigame_kunstofweg/sounds/clowntheme.wav")
+backgroundMusic:play()
 
 -- TO-DO: ADD VICTORY THEME
 --local victory_theme = playdate.sound.fileplayer.new('Minigames/TV_Tuner/sounds/static_noise')
@@ -76,16 +72,15 @@ local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, function() games
 ]]
 
 local initialSetup = false
-local shuffledMap, shuffledKeys, path, firstKey, firstValue 
+local shuffledMap, shuffledKeys, path, firstKey, firstValue, shuffledFirstFive
 
 function minigame_kunstofweg.update()
 	-- true is art, false is trash
 	if initialSetup == false then
 		shuffledMap, shuffledKeys = generateObjectMap()
 		firstKey, firstValue = getFirstEntry(shuffledMap, shuffledKeys)
-		local objectLowercased = string.lower(firstKey)
-		local objectNoSpaces = objectLowercased:gsub("%s+", "")
-		path = "Minigames/minigame_kunstofweg/images/".. objectNoSpaces .. ".png"
+		path = "Minigames/minigame_kunstofweg/images/objectSprites/".. firstKey .. ".png"
+        shuffledFirstFive = getFirstFiveEntriesShuffled(shuffledMap, shuffledKeys)
 		initialSetup = true
 	end
 
@@ -105,8 +100,10 @@ function minigame_kunstofweg.update()
 		slack_ui:add()
 		objectSprite:moveTo(275, 100)
 		objectSprite:add()
+		displaySprites(shuffledFirstFive)
 		mobware.AbuttonIndicator.start()
 		mobware.BbuttonIndicator.start()
+
 
 		if playdate.buttonIsPressed('a') then
 			if firstValue == true then
@@ -126,6 +123,8 @@ function minigame_kunstofweg.update()
 		mobware.AbuttonIndicator.stop()
 		mobware.BbuttonIndicator.stop()
 		mobware.print("NICE",200, 120)
+		local niceSound = snd.sampleplayer.new("Minigames/minigame_kunstofweg/sounds/nice.wav")
+		niceSound:play(1)
 		playdate.wait(2000)
 		return 1
 
@@ -134,6 +133,8 @@ function minigame_kunstofweg.update()
 		mobware.BbuttonIndicator.stop()
 		gfx.sprite.update() 
 		mobware.print("FOUT",200, 120)
+		local foutSound = snd.sampleplayer.new("Minigames/minigame_kunstofweg/sounds/fout.wav")
+		foutSound:play(1)
 		playdate.wait(2000)	
 		return 0
 
@@ -141,14 +142,16 @@ function minigame_kunstofweg.update()
 		mobware.AbuttonIndicator.stop()
 		mobware.BbuttonIndicator.stop()
 		gfx.sprite.update() 
-		local kunstVal
+		local message
 		if firstValue == true then
-			kunstVal = "Kunst"
+			message = "Het was Kunst!"
+			local kunstSound = snd.sampleplayer.new("Minigames/minigame_kunstofweg/sounds/kunst.wav")
+			kunstSound:play(1)
 		else
-			kunstVal = "Troep"
-
+			message = "Het mocht Weg!"
+			local wegSound = snd.sampleplayer.new("Minigames/minigame_kunstofweg/sounds/weg.wav")
+			wegSound:play(1)
 		end
-		local message = string.format("Het was %s", kunstVal)
 		mobware.print(message, 150, 120)
 		playdate.wait(2000)	
 		return 0
@@ -157,23 +160,56 @@ function minigame_kunstofweg.update()
 
 end
 
+function displaySprites(fiveRandomValues)
+    local yOffset = 0
+    local yOffsetIncrement = 40 -- Adjust this value to control the vertical spacing between sprites
+
+    for key, value in pairs(fiveRandomValues) do
+        -- Construct the message path using the key
+        local messagePath = "Minigames/minigame_kunstofweg/images/textSprites/" .. key .. "text.png"
+        local messageImage = gfx.image.new(messagePath)
+        local messageSprite = gfx.sprite.new(messageImage)
+
+        -- Determine the type path based on the value
+        local typePath
+        if value == false then
+            typePath = "Minigames/minigame_kunstofweg/images/weg.png"
+        else
+            typePath = "Minigames/minigame_kunstofweg/images/kunst.png"
+        end
+
+        local typeImage = gfx.image.new(typePath)
+        local typeSprite = gfx.sprite.new(typeImage)
+
+        -- Move sprites to their respective positions with offset
+        messageSprite:moveTo(70, 30 + yOffset)
+        typeSprite:moveTo(115, 30 + yOffset) -- Adjust the x and y positions as needed
+
+        -- Add sprites to the display
+        messageSprite:add()
+        typeSprite:add()
+
+        -- Increment the offset for the next pair of sprites
+        yOffset = yOffset + yOffsetIncrement
+    end
+end
+
 function generateObjectMap()
     -- Define a table with string keys
     local booleanMap = {
-        ["Kratje Pils"] = false,
-        ["Schoenen"] = false,
-        ["Wijnflessen"] = false,
-        ["Tafel"] = false,
-        ["Telefoons"] = false,
-        ["Zak Stiften"] = false,
-        ["Labelprinter"] = false,
-        ["Desktop"] = false,
-        ["PostIt"] = false,
-        ["Stapel Boeken"] = false,
-        ["Gitaar"] = false
+        ["kratje"] = false,
+        ["schoene"] = false,
+        ["flessen"] = false,
+        ["telefoon"] = false,
+        ["stiften"] = false,
+        ["printer"] = false,
+        ["desktop"] = false,
+        ["postit"] = false,
+        ["boeken"] = false,
+        ["gitaar"] = false
     }
 
-    -- Create a list of keys
+    -- Create a list of keysx
     local keys = {}
     for key in pairs(booleanMap) do
         table.insert(keys, key)
@@ -199,13 +235,28 @@ function getFirstEntry(shuffledMap, keys)
     return firstKey, shuffledMap[firstKey]
 end
 
-function getFirstFiveEntries(shuffledMap, keys)
-    local firstFive = {}
+function getFirstFiveEntriesShuffled(shuffledMap, keys)
+    local firstFiveList = {}
+    
+    -- Extract the first five key-value pairs into a list
     for i = 1, math.min(5, #keys) do
         local key = keys[i]
-        firstFive[key] = shuffledMap[key]
+        table.insert(firstFiveList, {key = key, value = shuffledMap[key]})
     end
-    return firstFive
+
+    -- Shuffle the list of key-value pairs
+    for i = #firstFiveList, 2, -1 do
+        local j = math.random(i)
+        firstFiveList[i], firstFiveList[j] = firstFiveList[j], firstFiveList[i]
+    end
+
+    -- Create a new table from the shuffled list
+    local shuffledFirstFive = {}
+    for _, pair in ipairs(firstFiveList) do
+        shuffledFirstFive[pair.key] = pair.value
+    end
+
+    return shuffledFirstFive
 end
 
 return minigame_kunstofweg
