@@ -56,7 +56,7 @@ local gamestate = 'start'
 mobware.BbuttonIndicator.start()
 
 -- start timer	 
-local MAX_GAME_TIME = 6 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
+local MAX_GAME_TIME = 16 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
 playdate.frameTimer.new( MAX_GAME_TIME * 20, function() gamestate = "timeUp" end ) --runs for 8 seconds at 20fps, and 4 seconds at 40fps
 	--> after <MAX_GAME_TIME> seconds (at 20 fps) will set "defeat" gamestate
 	--> I'm using the frame timer because that allows me to increase the framerate gradually to increase the difficulty of the minigame
