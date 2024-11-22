@@ -77,14 +77,15 @@ selection_sprite:setZIndex(1)
 local function showBinaryTreeRow(states, center_x, level)
 	local numSplits = 2 ^ (level-1)
 	local splitSpacing = 360 / numSplits
+	if #states == 1 then
+		splitSpacing = 0
+	end
 	local halfSpacing = splitSpacing / 2
 	local y = 25 + (level - 1) * 70
 	for index, value in ipairs(states) do
 		-- local pos_x = center_x - halfSpacing + spacing * (index - 1 ) -- + 0 if index 1, + spacing if index 2
 		local pos_x = 200 - (#states/2 - 0.5) * splitSpacing + (index - 1) * splitSpacing
-		if #states == 1 then
-			pos_x = center_x
-		end
+		
 		value.spr:moveTo(pos_x, y)
 		if selectedLevel == level and selectedLevelIndex == index then
 			selection_sprite:setImage(selection_frames:getImage(level))
