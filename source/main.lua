@@ -305,7 +305,7 @@ function playdate.update()
 		pcall(minigame_cleanup)
 		gfx.clear(gfx.kColorBlack)
 		gfx.setFont(mobware_font_M)
-		mobware.print("GAME OVER!")
+		mobware.print("HAIL hEIDRA!")
 		playdate.wait(4000)
 
 		--reload game from the beginning
