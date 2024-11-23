@@ -25,7 +25,7 @@ title_sprite:add()
 
 local handThreadSprite = gfx.sprite.new(gfx.image.new("Minigames/threading_needle/images/hand_with_thread"))
 local needleSprite = gfx.sprite.new(gfx.image.new("Minigames/threading_needle/images/needle"))
-handThreadSprite:setCollideRect(0, 20, 10, 10)
+handThreadSprite:setCollideRect(0, 22, 10, 2)
 needleSprite:setCollideRect(0, 0, 10, 20)
 handThreadSprite:moveTo(250, 120)
 needleSprite:moveTo(100, 120)
@@ -46,7 +46,7 @@ local gamestate = 'title'
 -- mobware.BbuttonIndicator.start()
 
 -- start timer	 
-local MAX_GAME_TIME = 12000 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
+local MAX_GAME_TIME = 12 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
 local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, 0.0, 1.0)
 game_timer.timerEndedCallback = function() gamestate = "defeat" end
 	--> after <MAX_GAME_TIME> seconds (at 20 fps) will set "defeat" gamestate
@@ -77,9 +77,11 @@ function threading_needle.update()
 		local curAccX, curAccY = playdate.readAccelerometer()
 		local accX = curAccX - neutralAccX
 		local accY = curAccY - neutralAccY
-		handThreadSprite:moveBy(accX*5, accY*5)
+		handThreadSprite:moveBy(accX*5, accY*6)
 		if #handThreadSprite:overlappingSprites() > 0 then
 			gamestate = "victory"
+		elseif handThreadSprite:getPosition() - handThreadSprite:getSize() / 2 < needleSprite:getPosition() then
+			gamestate = "defeat"
 		end
 	elseif gamestate == 'victory' then
 		-- The "victory" gamestate will simply show the victory animation and then end the minigame
