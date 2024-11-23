@@ -347,7 +347,7 @@ function playdate.update()
 	end
 
 	-- Added for debugging
-	playdate.drawFPS()
+	-- playdate.drawFPS()
 end
 
 -- Callback functions for Playdate inputs:
