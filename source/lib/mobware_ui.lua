@@ -27,7 +27,7 @@ end
 -- "A" button indicator
 local Abutton_spritesheet = gfx.imagetable.new("images/A-button")
 mobware.AbuttonIndicator = {}
-function mobware.AbuttonIndicator.start()
+function mobware.AbuttonIndicator.start(x,y)
 	mobware.AbuttonIndicator.AbuttonIndicator_sprite = AnimatedSprite.new( Abutton_spritesheet )
 	mobware.AbuttonIndicator.AbuttonIndicator_sprite:addState("mash",1,6, {tickStep = 2}, true )
 	mobware.AbuttonIndicator.AbuttonIndicator_sprite:moveTo(364,205)
@@ -171,10 +171,12 @@ end
 
 
 -- Q Timer indicator
-local q_timer_spritesheet = gfx.imagetable.new("images/q-timer")
+local q_timer_spritesheet_black = gfx.imagetable.new("images/q-timer")
+local q_timer_spritesheet_white = gfx.imagetable.new("images/q-timer-white")
+local q_timer_spritesheet = q_timer_spritesheet_white
 mobware.timer = {}
 mobware.timer.defaultZIndex = 1000
-mobware.timer.sprite = gfx.sprite.new(q_timer_spritesheet:getImage(1))
+mobware.timer.sprite = gfx.sprite.new(q_timer_spritesheet_black:getImage(1))
 mobware.timer.sprite:setZIndex(1000)
 function mobware.timer.setGameProgress(progress)
 	local frameIdx = progress * q_timer_spritesheet:getLength()
@@ -197,10 +199,23 @@ function mobware.timer.setPosition(pos)
 	end
 end
 
-function mobware.timer.reset()
-	mobware.timer.setPosition("bottomLeft")
+function mobware.timer.setColor(color)
+	if color == "black" then
+		q_timer_spritesheet = q_timer_spritesheet_black
+		mobware.timer.sprite:setImage(q_timer_spritesheet_black:getImage(1))
+	elseif color == "white" then
+		q_timer_spritesheet = q_timer_spritesheet_white
+	end
 	mobware.timer.sprite:setImage(q_timer_spritesheet:getImage(1))
+	
+end
+
+function mobware.timer.reset()
+	print "mobware timer reset"
+	mobware.timer.setPosition("bottomLeft")
+	mobware.timer.sprite:setImage(q_timer_spritesheet_black:getImage(1))
 	mobware.timer.sprite:setZIndex(mobware.timer.defaultZIndex)
+	mobware.timer.setColor("black")
 end
 
 -- initialize text box used for mobware.print

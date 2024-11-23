@@ -25,9 +25,13 @@ pd_sprite.crank_counter = 0
 pd_sprite.done = false
 
 -- start timer 
-local MAX_GAME_TIME = 5 -- define the time at 20 fps that the game will run betfore setting the "defeat" gamestate
-local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, function() gamestate = "defeat" end )
-	--> after <MAX_GAME_TIME> seconds (at 20 fps) will move to "defeat" gamestate
+local MAX_GAME_TIME = 8 -- define the time at 20 fps that the game will run betfore setting the "defeat" gamestate
+local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, 0.0, 1.0)
+game_timer.timerEndedCallback = function() gamestate = "defeat" end
+game_timer.updateCallback = function() mobware.timer.setGameProgress(game_timer.value) end
+
+
+mobware.timer.sprite:add()
 
 function jira.update()
 	-- update sprite animations
