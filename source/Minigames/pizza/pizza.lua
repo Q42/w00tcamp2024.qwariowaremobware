@@ -47,7 +47,6 @@ local numberOfSlices = 5
 local slicesStates = { 0.0, 0.0, 0.0, 0.0, 0.0 } --, 0.0 }
 
 local pizza_image = gfx.image.new("Minigames/pizza/images/pizza")
-local checkmark_image = gfx.image.new("Minigames/pizza/images/checkmark-filled")
 local checkmark_spritesheet = gfx.imagetable.new("Minigames/pizza/images/checkmark-filling")
 local fire_spritesheet = gfx.imagetable.new("Minigames/pizza/images/fire")
 local fire_sprite
@@ -69,7 +68,6 @@ pizza.setUp()
 
 function pizza.drawPizza()
 	assert(pizza_image, "pizza_image is nil")
-	assert(checkmark_image, "checkmark_image is nil")
 	assert(checkmark_spritesheet, "checkmark_spritesheet is nil")
 
 	-- Clear the screen
@@ -118,12 +116,10 @@ function pizza.drawPizza()
 		local jHatY = math.cos(angle) -- * 1.1
 
 		local image
-		if slicesStates[i] >= 1.0 then
-			image = checkmark_image
-		else 
+		do
 			-- select correct progress checkmark image from image table bases on slicesStates[i] so we can use it for drawSampled
 			local index = math.floor(slicesStates[i] * 25) + 1
-			index = math.min(index, 25)
+			index = math.min(index, 26)
 			image = checkmark_spritesheet:getImage(index)
 			local assertionMessage = "image is nil, could not load, i: " .. i .. ", slicesStates[i]: " .. slicesStates[i] .. ", index: " .. index
 			assert(image, assertionMessage)
@@ -169,15 +165,12 @@ function pizza.update()
 	previousTime = currentTime
 	
 	-- Print deltaTime to the console for debugging
-	print("Delta Time: " .. deltaTime)
+	-- print("Delta Time: " .. deltaTime)
 
 	local selectedSliceIndex = math.floor((1 - ((playdate.getCrankPosition() - 180 / numberOfSlices) / 360)) * numberOfSlices) + 1
-
-	print(selectedSliceIndex)
 	if selectedSliceIndex > numberOfSlices then
 		selectedSliceIndex = 1
 	end
-	print(selectedSliceIndex)
 	
 	-- increment slice value by dt
 	for i = 1, numberOfSlices do
