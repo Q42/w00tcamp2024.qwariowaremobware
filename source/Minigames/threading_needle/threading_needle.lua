@@ -21,14 +21,15 @@ local gfx <const> = playdate.graphics
 local title_sprite = gfx.sprite.new(gfx.image.new("Minigames/threading_needle/images/threading_needle_title"))
 
 title_sprite:moveTo(200, 120)
-title_sprite:add()
+-- title_sprite:add()
 
 local handThreadSprite = gfx.sprite.new(gfx.image.new("Minigames/threading_needle/images/hand_with_thread"))
 local needleSprite = gfx.sprite.new(gfx.image.new("Minigames/threading_needle/images/needle"))
 handThreadSprite:setCollideRect(0, 22, 10, 2)
-needleSprite:setCollideRect(0, 0, 10, 20)
-handThreadSprite:moveTo(250, 120)
-needleSprite:moveTo(100, 120)
+needleSprite:setCollideRect(0, 3, 8, 14)
+local handThreadY = 95 + math.random(-30, 40)
+handThreadSprite:moveTo(250, handThreadY)
+needleSprite:moveTo(100, 95)
 
 local neutralAccX = 0.0
 local neutralAccY = 0.0
@@ -65,15 +66,20 @@ function threading_needle.update()
 
 	-- In the first stage of the minigame, the user needs to hit the "B" button
 	if gamestate == 'title' then
+		needleSprite:add()
+		handThreadSprite:add()
+		gfx.sprite.update()
+		mobware.print("Hold steady!", 100, 200)
+		playdate.display.flush()
 		playdate.wait(1500)
 		neutralAccX, neutralAccY = playdate.readAccelerometer()
 		print("NaccX: " .. neutralAccX .. " NaccY: " .. neutralAccY)
 
 		title_sprite:remove()
 		gamestate = 'playing'
-		needleSprite:add()
-		handThreadSprite:add()
+		mobware.AccelerometerIndicator.start()
 	elseif gamestate == 'playing' then
+		mobware.print("Thread the needle!", 0, 15)
 		local curAccX, curAccY = playdate.readAccelerometer()
 		local accX = curAccX - neutralAccX
 		local accY = curAccY - neutralAccY
