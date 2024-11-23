@@ -1,6 +1,7 @@
 local elephants = {}
 
 local gfx <const> = playdate.graphics
+local snd = playdate.sound
 math.randomseed(playdate.getSecondsSinceEpoch())
 local state = "playing"
 local MIC_THRESHOLD = 0.65 -- Adjust this threshold based on the desired sensitivity
@@ -16,6 +17,9 @@ mobware.timer.sprite:add()
 local MAX_GAME_TIME = 12 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
 local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, 0.0, 1.0)
 game_timer.timerEndedCallback = function() gamestate = "defeat" end
+
+local htpbgmusic = snd.sampleplayer.new("Minigames/elephants/sounds/htpbgmusic")
+htpbgmusic:play(0)
 
 local ollieImage = gfx.image.new("Minigames/elephants/images/ellie.png")
 local ollieSprite = gfx.sprite.new(ollieImage)
@@ -34,6 +38,8 @@ local elephantSprites = {}
 local elephantTimers = {}
 local numElephants = 5
 local allTimersDone = false
+local finalSoundPlayed = false
+
 for i = 1, numElephants do
   local xOffset = math.random(-20, 20) -- Random x offset between -20 and 20
   local yOffset = math.random(-10, 10) -- Random y offset between -10 and 10
@@ -65,7 +71,8 @@ function elephants.update()
   print("mic level: " .. micLevel)
   -- Check if the microphone input level is above the threshold
   if micLevel > MIC_THRESHOLD then
-    state = "done"
+    state = "done"    
+    elephants.PlayYay()
     print("You scared the elephants away!")
     drawText("You scared the elephants away!", 0, 0)
     playdate.sound.micinput.stopListening()
@@ -88,6 +95,7 @@ function elephants.update()
     mobware.MicIndicator.stop()
   end
   if gamestate == "defeat" then
+    elephants.PlayElephant()
     print("The elephants are still here!")
     playdate.sound.micinput.stopListening()
     
@@ -146,6 +154,22 @@ end
 function elephants.cleanup()
   -- Stop listening to the microphone when the game is done
   playdate.sound.micinput.stopListening()
+end
+
+function elephants.PlayElephant()
+  if finalSoundPlayed == false then
+    finalSoundPlayed = true
+    local elephants = snd.sampleplayer.new("Minigames/elephants/sounds/elephant")
+    elephants:play(1)
+  end
+end
+
+function elephants.PlayYay()
+  if finalSoundPlayed == false then
+    finalSoundPlayed = true
+    local yay = snd.sampleplayer.new("Minigames/elephants/sounds/yay")
+    yay:play(1)
+  end
 end
 
 return elephants
