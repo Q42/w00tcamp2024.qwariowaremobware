@@ -153,7 +153,7 @@ local function jump()
 end
 
 -- start timer
-local MAX_GAME_TIME = 20 -- define the time at 20 fps that the game will run betfore setting the "defeat" gamestate
+local MAX_GAME_TIME = 30 -- define the time at 20 fps that the game will run betfore setting the "defeat" gamestate
 local game_state = "running"
 local game_timer = playdate.frameTimer.new(MAX_GAME_TIME * 20, 0.0, 1.0)
 game_timer.timerEndedCallback = function() game_state = "defeat" end
