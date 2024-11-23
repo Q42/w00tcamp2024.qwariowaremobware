@@ -113,6 +113,8 @@ function stef.update()
     headerSprite:remove()
     mobware.print("Schoon!", screenWidth/2, 50)
     schoon:play()
+    gfx.sprite.update()
+    playdate.display.flush()
     playdate.wait(2000)
     
     print("You cleaned the head!")
