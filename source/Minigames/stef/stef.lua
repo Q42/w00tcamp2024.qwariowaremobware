@@ -111,12 +111,12 @@ function stef.update()
     smots1Sprite:remove()
     smots2Sprite:remove()
     headerSprite:remove()
-    mobware.print("Schoon!", screenWidth/2, 50)
     schoon:play()
     gfx.sprite.update()
     playdate.display.flush()
+    mobware.print("Schoon!", screenWidth / 2, 50)
     playdate.wait(2000)
-    
+
     print("You cleaned the head!")
     playdate.stopAccelerometer()
     return 1 -- Return 1 to indicate that the player has won
