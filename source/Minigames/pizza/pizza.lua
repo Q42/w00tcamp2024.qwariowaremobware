@@ -42,19 +42,27 @@ local MAX_GAME_TIME = 5 -- define the time at 20 fps that the game will run betf
 	--> after <MAX_GAME_TIME> seconds (at 20 fps) will set "defeat" gamestate
 	--> I'm using the frame timer because that allows me to increase the framerate gradually to increase the difficulty of the minigame
 
-local numberOfSlices = 6
+local numberOfSlices = 5
 -- array with float values between 0 and 1
-local slicesStates = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
+local slicesStates = { 0.0, 0.0, 0.0, 0.0, 0.0 } --, 0.0 }
 
 local pizza_image = gfx.image.new("Minigames/pizza/images/pizza")
 local checkmark_image = gfx.image.new("Minigames/pizza/images/checkmark-filled")
 local checkmark_spritesheet = gfx.imagetable.new("Minigames/pizza/images/checkmark-filling")
+local fire_spritesheet = gfx.imagetable.new("Minigames/pizza/images/fire")
+local fire_sprite
+local victory_noise = playdate.sound.sampleplayer.new('Minigames/pizza/sounds/pizza_calzone')
 
 -- Variable to store the time of the previous frame
 local previousTime = playdate.getCurrentTimeMilliseconds()
 
 function pizza.setUp()
     print("setUp called.")
+
+	-- fire_sprite = AnimatedSprite.new(fire_spritesheet)
+	-- fire_sprite:addState("mash",1,6, {tickStep = 2}, true)
+	-- fire_sprite:setZIndex(1000)
+	-- fire_sprite:setIgnoresDrawOffset(true)
 end
 
 pizza.setUp()
@@ -66,6 +74,12 @@ function pizza.drawPizza()
 
 	-- Clear the screen
 	playdate.graphics.clear()
+
+	-- draw fire sprite
+	do 
+		local index = math.floor(playdate.getCurrentTimeMilliseconds() / 100) % 2 + 1
+		fire_spritesheet:getImage(index):drawScaled(90, 180, 1.25, 1)
+	end
 
 	-- Define the parameters for drawSampled
     local z = 100 -- Depth (not typically used in 2D)
@@ -158,7 +172,7 @@ function pizza.update()
 	print("Delta Time: " .. deltaTime)
 
 	local selectedSliceIndex = math.floor((1 - ((playdate.getCrankPosition() - 180 / numberOfSlices) / 360)) * numberOfSlices) + 1
-	
+
 	print(selectedSliceIndex)
 	if selectedSliceIndex > numberOfSlices then
 		selectedSliceIndex = 1
@@ -168,9 +182,9 @@ function pizza.update()
 	-- increment slice value by dt
 	for i = 1, numberOfSlices do
 		if i == selectedSliceIndex then
-			slicesStates[i] = math.min(slicesStates[i] + deltaTime / 2, 1.0)
+			slicesStates[i] = math.min(slicesStates[i] + deltaTime, 2.0)
 		elseif  slicesStates[i] < 1.0 then
-			slicesStates[i] = math.max(slicesStates[i] - deltaTime / 6, 0.0)
+			slicesStates[i] = math.max(slicesStates[i] - deltaTime / 2, 0.0)
 		end
 	end
 
@@ -196,7 +210,8 @@ function pizza.update()
 	elseif gamestate == 'victory' then
 		gfx.sprite.update() 
 		mobware.print("DAT RUIKT HEERLIJK")
-		playdate.wait(2000)
+		victory_noise:play()
+		playdate.wait(3000)
 		return 1
 	elseif gamestate == 'defeat' then
 		gfx.sprite.update() 
