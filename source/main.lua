@@ -120,7 +120,8 @@ end
 -- Call function to initialize and start game
 initialize_metagame()
 
-endgameText = ""
+local endgameText = ""
+local restartTimer
 -- Main game loop called every frame
 function playdate.update()
 	if GameState == 'start' then
@@ -301,6 +302,16 @@ function playdate.update()
 		building:changeState("hoist")
 		
 		endgameText = "You lost!"
+		if restartTimer == nil then
+			print("starting restart timer")
+			restartTimer = playdate.frameTimer.performAfterDelay(120, function()
+				initialize_metagame()
+				GameState = 'initialize'
+				restartTimer = nil
+			end)
+		end
+
+
 		GameState = 'transition'
 	elseif GameState == 'game_won' then
 		pcall(minigame_cleanup)
@@ -321,10 +332,18 @@ function playdate.update()
 		building:moveTo(200, 120)
 		-- building:setZIndex(2)
 		building:changeState("hoist")
-		GameState = 'transition'
+		if restartTimer == nil then
+			print("starting restart timer")
+			restartTimer = playdate.frameTimer.performAfterDelay(120, function()
+				initialize_metagame()
+				GameState = 'initialize'
+				restartTimer = nil
+			end)
+		end
 		endgameText = "You won!"
+		GameState = 'transition'
 	end
-
+	
 	-- Added for debugging
 	playdate.drawFPS()
 end
@@ -460,36 +479,5 @@ function checkEndGame()
 		print("game won!")
 		GameState = 'game_won'
 		-- showBuilding(q_building)
-	end
-end
-
-local restartTimer
-function showBuilding(building_image)
-	print("showing building")
-	pcall(minigame_cleanup)
-	
-	-- remove the man and poster
-	if the_man_sprite then
-		the_man_sprite:remove()
-		the_man_sprite = nil
-	end
-	
-	if poster_complete_sprite then
-		poster_complete_sprite:remove()
-		poster_complete_sprite = nil
-	end
-
-	gfx.clear(gfx.kColorWhite)
-
-	
-	
-
-	if restartTimer == nil then
-		print("starting restart timer")
-		restartTimer = playdate.frameTimer.performAfterDelay(60, function()
-			initialize_metagame()
-			GameState = 'initialize'
-			restartTimer = nil
-		end)
 	end
 end
