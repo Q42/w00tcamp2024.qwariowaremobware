@@ -40,10 +40,10 @@ mobware.timer.sprite:add()
 
 -- Load cactusses
 local cactuses = {
-    { image = "Minigames/dino_the_game/images/smoll_cactus.png", x = 400, y = 180, },
-    { image = "Minigames/dino_the_game/images/big_cactus.png", x = 800, y = 180, },
-    { image = "Minigames/dino_the_game/images/multiple_cactus.png", x = 1300, y = 180 },
-    { image = "Minigames/dino_the_game/images/smoll_cactus.png",    x = 1700,  y = 180, }
+    { image = "Minigames/dino_the_game/images/smoll_cactus.png", x = math.random(350, 450), y = 180, },
+    { image = "Minigames/dino_the_game/images/big_cactus.png", x = math.random(750, 850), y = 180, },
+    { image = "Minigames/dino_the_game/images/multiple_cactus.png", x = math.random(1250, 1350), y = 180 },
+    { image = "Minigames/dino_the_game/images/smoll_cactus.png",    x = math.random(1650, 1750), y = 180, }
 }
 local cactus_sprites = {}
 
@@ -141,19 +141,19 @@ mobware.BbuttonIndicator.start()
 
 -- Jump variables
 local gravity = 0.8
-local jump_velocity = -12
+local jump_velocity = -14
 local dino_y = 175
 local is_jumping = false
 
 local function jump()
     if not is_jumping then
         is_jumping = true
-        jump_velocity = -12
+        jump_velocity = -14
     end
 end
 
 -- start timer
-local MAX_GAME_TIME = 30 -- define the time at 20 fps that the game will run betfore setting the "defeat" gamestate
+local MAX_GAME_TIME = 32 -- define the time at 20 fps that the game will run betfore setting the "defeat" gamestate
 local game_state = "running"
 local game_timer = playdate.frameTimer.new(MAX_GAME_TIME * 20, 0.0, 1.0)
 game_timer.timerEndedCallback = function() game_state = "defeat" end
@@ -166,14 +166,15 @@ function dino_the_game.update()
     if doesDinoCollideWithCactus() then
         cry_sound:play()
         mobware.print("DAT IS NIET HANDIG HÉ")
-        playdate.wait(1000)
+        playdate.wait(2200)
         return 0
     end
 
-    local crankChange = playdate.getCrankChange()
+    local crankChange = playdate.getCrankChange() / 2
 
     updateCactus(crankChange)
 
+    -- Endgame with finish
     if dino_position >= 1800 and not finished then
         endgame = true
         finish_sprite:setVisible(true)
@@ -183,13 +184,34 @@ function dino_the_game.update()
                 finished = true
                 mobware.print("FINISHED!")
                 finish_sound:play()
-                playdate.wait(1300)
+                playdate.wait(1400)
                 return 1;
             end
         else
             finish_position = finish_position - crankChange
             finish_sprite:moveTo(finish_position, finish_y)
         end
+    end
+
+    -- Walking
+    if crankChange > 0 and not finished then
+        if finish_position > 300 then
+            background_sprite:moveBy(-crankChange, 0)
+        end
+
+        if endgame then
+            dino_sprite:moveBy(crankChange, 0)
+        end
+
+        if is_jumping then
+            dino_sprite:changeState("standing")
+        else
+            dino_sprite:changeState("walking")
+        end
+
+        dino_position = dino_position + crankChange
+    else
+        dino_sprite:changeState("standing")
     end
 
     -- Handle jumping
@@ -214,31 +236,10 @@ function dino_the_game.update()
         jump()
     end
 
-    if crankChange > 0 and not finished then
-
-        if finish_position > 300 then
-            background_sprite:moveBy(-crankChange, 0)
-        end
-
-        if endgame then
-            dino_sprite:moveBy(crankChange, 0)
-        end
-
-        if is_jumping then
-            dino_sprite:changeState("standing")
-        else
-            dino_sprite:changeState("walking")
-        end
-
-        dino_position = dino_position + crankChange
-    else
-        dino_sprite:changeState("standing")
-    end
-
     if game_state == "defeat" then
         cry_sound:play()
-        mobware.print("MET DIT TEMPO RED JE HET NIET")
-        playdate.wait(1700)
+        mobware.print("MET DIT TEMPO\n RED JE HET NIET")
+        playdate.wait(2300)
         return 0
     end
 end
