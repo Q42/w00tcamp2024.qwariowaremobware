@@ -66,17 +66,15 @@ local isFlipped
 local aButton = makeCustomButton('a')
 local bButton = makeCustomButton('b')
 
-local pizza_sprite
+local pizza_image = gfx.image.new("Minigames/pizza/images/pizza")
+-- local pizza_sprite = gfx.sprite.new(pizza_image)
 
 function pizza.setUp()
     print("setUp called.")
 	isFlipped = math.random() < 0.5
-
-	local bg_path = "Minigames/pizza/images/pizza"
-	local background_image = gfx.image.new(bg_path)
-	pizza_sprite = gfx.sprite.new(background_image)
-	pizza_sprite:moveTo(200, 120)
-	pizza_sprite:add()
+	
+	-- pizza_sprite:moveTo(200, 120)
+	-- pizza_sprite:add()
 
 	if isFlipped then
 		aButton:moveTo(36 + 72, 240 - 36 - 16)
@@ -89,12 +87,70 @@ end
 
 pizza.setUp()
 
+function pizza.drawPizza()
+	assert(pizza_image, "pizza_image is nil")
+
+	-- Clear the screen
+	playdate.graphics.clear()
+
+	-- Get the image dimensions
+    local width, height = pizza_image:getSize()
+
+	-- Define the parameters for drawSampled
+    local z = 100 -- Depth (not typically used in 2D)
+    local tiltAngle = 20 -- Tilt angle in degrees
+
+    -- Get the current time in milliseconds
+	local currentTime = playdate.getCurrentTimeMilliseconds()
+
+	-- Calculate a sine wave value based on the current time
+	-- Adjust the frequency and amplitude as needed
+	local frequency = 0.0001 -- Frequency of the sine wave
+	local amplitude = 45 -- Amplitude of the sine wave
+	local sineValue = math.sin(currentTime * frequency) * amplitude
+	tiltAngle = sineValue
+	print("tiltAngle", tiltAngle)
+
+	local crankAngle = playdate.getCrankPosition() / 360 * (2 * math.pi) 
+	local iHatX = math.cos(crankAngle) * 1.1
+	local iHatY = math.sin(crankAngle) * 1.1
+	local jHatX = -math.sin(crankAngle) * 1.1
+	local jHatY = math.cos(crankAngle) * 1.1
+
+    -- Draw the sampled image
+	-- pizza_image:draw(100, 100)
+    pizza_image:drawSampled(80, 0, width, height, -- x, y, width, height
+						0.5, 0.5, -- center x, y
+						iHatX, jHatX,-- dxx, dyx
+						iHatY, jHatY, -- dxy, dyy
+						0.5, 0.5, -- dx, dy
+						500, -- z
+						45, -- tilt angle
+						false -- tile
+					)
+
+	-- field:drawSampled(0, 70, 200, 50,  -- x, y, width, height
+	-- 				0.5, 0.95, -- center x, y
+	-- 				c / fieldscale, s / fieldscale, -- dxx, dyx
+	-- 				-s / fieldscale, c / fieldscale, -- dxy, dyy
+	-- 				x/fieldwidth, y/fieldheight, -- dx, dy
+	-- 				16, -- z
+	-- 				16.6, -- tilt angle
+	-- 				true); -- tile
+
+    -- Update the display
+    playdate.display.flush()
+end
+
 function pizza.update()
 	-- updates all sprites
-	gfx.sprite.update() 
+	-- gfx.sprite.update() 
 
+	pizza.drawPizza()
+
+	
 	-- update timer
-	playdate.frameTimer.updateTimers()
+	-- playdate.frameTimer.updateTimers()
 
 	if playdate.buttonJustPressed(playdate.kButtonA) then
 		if not isFlipped then
