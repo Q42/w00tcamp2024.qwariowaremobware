@@ -51,7 +51,8 @@ local slicesStates = { 0.0, 0.0, 0.0, 0.0, 0.0 } --, 0.0 }
 local pizza_image = gfx.image.new("Minigames/pizza/images/pizza")
 local checkmark_spritesheet = gfx.imagetable.new("Minigames/pizza/images/checkmark-filling")
 local fire_spritesheet = gfx.imagetable.new("Minigames/pizza/images/fire")
-local fire_sprite
+local bram_blij = gfx.image.new("Minigames/pizza/images/dither_it_bram_blij")
+local bram_rug = gfx.image.new("Minigames/pizza/images/dither_it_bram_rug")
 local victory_noise = playdate.sound.sampleplayer.new('Minigames/pizza/sounds/pizza_calzone')
 
 -- Variable to store the time of the previous frame
@@ -137,14 +138,11 @@ function pizza.drawPizza()
 		)
 	end
 
-	-- field:drawSampled(0, 70, 200, 50,  -- x, y, width, height
-	-- 				0.5, 0.95, -- center x, y
-	-- 				c / fieldscale, s / fieldscale, -- dxx, dyx
-	-- 				-s / fieldscale, c / fieldscale, -- dxy, dyy
-	-- 				x/fieldwidth, y/fieldheight, -- dx, dy
-	-- 				16, -- z
-	-- 				16.6, -- tilt angle
-	-- 				true); -- tile
+	-- draw bram sprite
+	do 
+		assert(bram_rug, "bram_rug is nil")
+		bram_rug:drawAnchored(420, 240, 1, 1)
+	end
 
     -- Update the display
     playdate.display.flush()
@@ -203,7 +201,14 @@ function pizza.update()
 		-- do nothing
 	elseif gamestate == 'victory' then
 		gfx.sprite.update() 
-		mobware.print("DAT RUIKT HEERLIJK")
+
+		-- draw bram sprite
+		do 
+			assert(bram_blij, "bram_blij is nil")
+			bram_blij:drawAnchored(200, 120, 0.5, 0.4)
+		end
+
+		mobware.print("DAT RUIKT HEERLIJK", nil, 180)
 		victory_noise:play()
 		playdate.wait(3000)
 		return 1
