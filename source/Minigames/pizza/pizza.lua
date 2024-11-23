@@ -37,8 +37,10 @@ local pizza = {}
 local gamestate = 'start'
 
 -- start timer	 
-local MAX_GAME_TIME = 5 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
--- local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, function() gamestate = "timeUp" end ) --runs for 8 seconds at 20fps, and 4 seconds at 40fps
+local MAX_GAME_TIME = 16 -- define the time at 20 fps that the game will run betfore setting the "defeat" gamestate
+local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, 0.0, 1.0)
+game_timer.timerEndedCallback = function() gamestate = "timeUp" end
+game_timer.updateCallback = function() mobware.timer.setGameProgress(game_timer.value) end
 	--> after <MAX_GAME_TIME> seconds (at 20 fps) will set "defeat" gamestate
 	--> I'm using the frame timer because that allows me to increase the framerate gradually to increase the difficulty of the minigame
 
@@ -65,13 +67,11 @@ function pizza.setUp()
 end
 
 pizza.setUp()
+mobware.timer.sprite:add()
 
 function pizza.drawPizza()
 	assert(pizza_image, "pizza_image is nil")
 	assert(checkmark_spritesheet, "checkmark_spritesheet is nil")
-
-	-- Clear the screen
-	playdate.graphics.clear()
 
 	-- draw fire sprite
 	do 
@@ -154,6 +154,7 @@ function pizza.update()
 	-- updates all sprites
 	-- gfx.sprite.update() 
 
+	mobware.timer.sprite:update()
 	pizza.drawPizza()
 
 	-- update timer
@@ -175,9 +176,9 @@ function pizza.update()
 	-- increment slice value by dt
 	for i = 1, numberOfSlices do
 		if i == selectedSliceIndex then
-			slicesStates[i] = math.min(slicesStates[i] + deltaTime, 2.0)
+			slicesStates[i] = math.min(slicesStates[i] + deltaTime * 2, 2.0)
 		elseif  slicesStates[i] < 1.0 then
-			slicesStates[i] = math.max(slicesStates[i] - deltaTime / 2, 0.0)
+			slicesStates[i] = math.max(slicesStates[i] - deltaTime, 0.0)
 		end
 	end
 
