@@ -262,45 +262,6 @@ function playdate.update()
 		gfx.setFont(mobware_font_S)
 		mobware.print("score: " .. getScore(), 15, 20)
 		gfx.setFont(mobware_default_font) -- reset font to default
-	elseif GameState == 'offer_unlockable' then
-		-- here the player is given the option to purchase unlockable content with their in-game currency
-
-		-- TO-DO: instead of doing this iterate over unlocked_bonus_games list?
-		-- generating easily referencable dictionary of unlocked games
-		-- TO-DO: move this to utilities?
-		if is_in_bonus_game_list then
-			print('is_in_bonus_game_list already generated')
-		else
-			-- create a set so that we can easily
-			print('is_in_bonus_game_list not found. Creating...')
-			is_in_bonus_game_list = {}
-			for _, i in ipairs(bonus_game_list) do
-				is_in_bonus_game_list[i] = true
-			end
-		end
-
-		-- check if there is an unlockable game corresponding to the minigame that was just completed
-		if is_in_bonus_game_list[unlockable_game] then
-			if unlocked_bonus_games[unlockable_game] then
-				print("what a shame, you've already unlocked the extra for", unlockable_game)
-				GameState = 'transition'
-			else
-				-- offer player to purchase bonus game
-				print("you're in luck, unlockable content for", unlockable_game, "is available!")
-				-- TO-DO: ADD CUTSCENE HERE WHERE PLAYER HAS OPTION TO PURCHASE BONUS CONTENT
-				print(unlockable_game, "unlocked")
-
-				-- Save updated list of unlockable games to file
-				unlocked_bonus_games[unlockable_game] = "unlocked" -- add bonus game to list of unlocked content
-				playdate.datastore.write(unlocked_bonus_games, "mobware_unlockables")
-
-				GameState = 'transition'
-			end
-		else
-			print("no bonus game found for", unlockable_game)
-			-- return to transition gamestate to continue game
-			GameState = 'transition'
-		end
 	elseif GameState == 'game_over' then
 		-- TO-DO: UPDATE WITH GAME OVER SEQUENCE
 
@@ -313,13 +274,18 @@ function playdate.update()
 
 		--reload game from the beginning
 		initialize_metagame()
-	elseif GameState == 'credits' then
-		-- Play credits sequence
-
-		-- load "credits" as minigame
+	elseif GameState == 'game_won' then
 		pcall(minigame_cleanup)
-		minigame = load_minigame('credits')
-		GameState = 'play'
+		gfx.clear(gfx.kColorBlack)
+		gfx.setFont(mobware_font_M)
+		mobware.print("You WON!")
+		playdate.wait(1000)
+		mobware.print("You've won " .. games_won .. " games!")
+		playdate.wait(1000)
+		mobware.print("And lost " .. games_lost .. " games...")
+		playdate.wait(2000)
+
+		initialize_metagame()
 	end
 
 	-- Added for debugging
@@ -371,16 +337,6 @@ function playdate.upButtonUp() if minigame and minigame.upButtonUp then minigame
 
 sysMenu = playdate.getSystemMenu()
 
---[[
--- Add menu option to view credits
-sysMenu:addMenuItem(
-	'Game Credits',
-	function()
-		pcall(minigame_cleanup)
-		GameState = "credits"
-	end
-)
-]]
 -- OPTIONAL DEBUGGING MENU OPTION TO CHOOSE MINIGAME:
 sysMenu:addOptionsMenuItem("game:", minigame_list,
 	function(selected_minigame)
@@ -459,9 +415,15 @@ function checkEndGame()
 		-- after 2000ms
 		print("game over!")
 		playdate.frameTimer.performAfterDelay(60, function()
-			print("setting gamestate to game_over")
 			GameState = 'game_over'
 		end)
+	end
+
+	if lose_guage <= 0 and time_scaler >= 20 then
+		print("game won!")
+		GameState = 'game_won'
+		print("setting gamestate to game_won")
+		
 	end
 	-- when win?
 end
