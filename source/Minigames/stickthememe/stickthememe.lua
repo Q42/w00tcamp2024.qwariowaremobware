@@ -128,7 +128,7 @@ function stickthememe.update()
 	if gamestate == 'start' then
 		if playdate.buttonIsPressed('a') then
 			stickitSound:play(1)
-			if x >= 80 and x <= 90 then
+			if x >= 75 and x <= 95 then
 				gamestate = 'victory'
 			else
 				gamestate = 'defeat'
