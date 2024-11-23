@@ -10,6 +10,9 @@ local screenWidth, screenHeight = playdate.display.getSize()
 mobware.timer.setPosition("bottomLeft")
 mobware.timer.sprite:add()
 
+local vies = playdate.sound.sampleplayer.new("Minigames/stef/sounds/vies.wav")
+local schoon = playdate.sound.sampleplayer.new("Minigames/stef/sounds/lekkerschoon.wav")
+
 local gfx <const> = playdate.graphics
 local stefImage = gfx.image.new("Minigames/stef/images/stef.png")
 assert(stefImage, "Failed to load stef image")
@@ -109,6 +112,7 @@ function stef.update()
     smots2Sprite:remove()
     headerSprite:remove()
     mobware.print("Schoon!", screenWidth/2, 50)
+    schoon:play()
     playdate.wait(2000)
     
     print("You cleaned the head!")
@@ -119,6 +123,7 @@ function stef.update()
   if gamestate == "defeat" then
     headerSprite:remove()
     mobware.print("duurt te lang!")
+    vies:play()
     playdate.wait(2000)
     return 0
   end
