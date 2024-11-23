@@ -48,7 +48,7 @@ local poster_complete_sprite
 local games_won = 0
 local games_lost = 0
 local lose_guage = 0;
-local max_lose_guage = 4
+local max_lose_guage = 0
 local game_start_timer
 local the_man_sprite
 local poster_complete_sprite
@@ -120,6 +120,7 @@ end
 -- Call function to initialize and start game
 initialize_metagame()
 
+endgameText = ""
 -- Main game loop called every frame
 function playdate.update()
 	if GameState == 'start' then
@@ -192,7 +193,15 @@ function playdate.update()
 
 			-- Set up demon sprite for transition animation
 			set_white_background()
+			if game_result == 0 then
+				onGameLost();
+			elseif game_result == 1 then
+				onGameWon();
+				-- TODO: some kind of win state
 
+				-- increase game speed after each successful minigame:
+				time_scaler = time_scaler + 1
+			end
 			-- animation for the pasting man
 		
 			the_man_sprite = AnimatedSprite.new(the_man_image_table)
@@ -252,15 +261,7 @@ function playdate.update()
 			end
 
 
-			if game_result == 0 then
-				onGameLost();
-			elseif game_result == 1 then
-				onGameWon();
-				-- TODO: some kind of win state
-
-				-- increase game speed after each successful minigame:
-				time_scaler = time_scaler + 1
-			end
+			
 
 
 		end
@@ -276,12 +277,52 @@ function playdate.update()
 		-- display UI for transition
 		gfx.setFont(mobware_font_S)
 		mobware.print("score: " .. getScore(), 15, 20)
+		if endgameText ~= "" then
+			mobware.print(endgameText, 270, 200)
+		end
 		gfx.setFont(mobware_default_font) -- reset font to default
 	elseif GameState == 'game_over' then
-		gfx.sprite.update()
-	elseif GameState == 'game_won' then
+		pcall(minigame_cleanup)
+		set_white_background()
+		if the_man_sprite then
+			the_man_sprite:remove()
+			the_man_sprite = nil
+		end
+		if poster_complete_sprite then
+			poster_complete_sprite:remove()
+			poster_complete_sprite = nil
+		end
+		local building = AnimatedSprite.new(eidra_building)
+		building:addState("idle", 1, 1, { tickStep = 3, loop = true, nextAnimation = "idle" }, true)
+		building:addState("hoist", 2, 9, { tickStep = 7, loop = false, nextAnimation = "hoisted" }, true)
+		building:addState("hoisted", 9, 9, { tickStep = 3, loop = true, nextAnimation = "idle" }, true)
+		building:moveTo(200, 120)
+		-- building:setZIndex(2)
+		building:changeState("hoist")
 		
-		gfx.sprite.update()
+		endgameText = "You lost!"
+		GameState = 'transition'
+	elseif GameState == 'game_won' then
+		pcall(minigame_cleanup)
+		set_white_background()
+		if the_man_sprite then
+			the_man_sprite:remove()
+			the_man_sprite = nil
+		end
+		if poster_complete_sprite then
+			poster_complete_sprite:remove()
+			poster_complete_sprite = nil
+		end
+		mobware.print("you won!", 15, 20)
+		local building = AnimatedSprite.new(q_building)
+		building:addState("idle", 1, 1, { tickStep = 3, loop = true, nextAnimation = "idle" }, true)
+		building:addState("hoist", 2, 9, { tickStep = 7, loop = false, nextAnimation = "hoisted" }, true)
+		building:addState("hoisted", 9, 9, { tickStep = 3, loop = true, nextAnimation = "idle" }, true)
+		building:moveTo(200, 120)
+		-- building:setZIndex(2)
+		building:changeState("hoist")
+		GameState = 'transition'
+		endgameText = "You won!"
 	end
 
 	-- Added for debugging
@@ -411,14 +452,14 @@ function checkEndGame()
 		-- after 2000ms
 		print("game over!")
 		GameState = 'game_over'
-		showBuilding(eidra_building)
+		-- showBuilding(eidra_building)
 
 	end
 
 	if lose_guage <= 0 and time_scaler >= 10 then
 		print("game won!")
 		GameState = 'game_won'
-		showBuilding(q_building)
+		-- showBuilding(q_building)
 	end
 end
 
@@ -440,13 +481,7 @@ function showBuilding(building_image)
 
 	gfx.clear(gfx.kColorWhite)
 
-	local building = AnimatedSprite.new(building_image)
-	building:addState("idle", 1, 1, { tickStep = 3, loop = true, nextAnimation = "idle" }, true)
-	building:addState("hoist", 2, 9, { tickStep = 7, loop = false, nextAnimation = "hoisted" }, true)
-	building:addState("hoisted", 9, 9, { tickStep = 3, loop = true, nextAnimation = "idle" }, true)
-	building:moveTo(200, 120)
-	-- building:setZIndex(2)
-	building:changeState("hoist")
+	
 	
 
 	if restartTimer == nil then
