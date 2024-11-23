@@ -308,6 +308,7 @@ function playdate.update()
 				initialize_metagame()
 				GameState = 'initialize'
 				restartTimer = nil
+				endgameText = ""
 			end)
 		end
 
@@ -337,6 +338,7 @@ function playdate.update()
 			restartTimer = playdate.frameTimer.performAfterDelay(120, function()
 				initialize_metagame()
 				GameState = 'initialize'
+				endgameText = ""
 				restartTimer = nil
 			end)
 		end
