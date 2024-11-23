@@ -223,7 +223,11 @@ function handleButtons()
 	end
 end
 function nextWord()
-	current_word = word_list[math.random(#word_list)]
+	local new_Word
+	repeat
+		new_Word = word_list[math.random(#word_list)]
+	until new_Word ~= current_word
+	current_word = new_Word
 	-- play the audio file
 	if audioFiles[current_word] then
 		audioFiles[current_word]:play(1)
