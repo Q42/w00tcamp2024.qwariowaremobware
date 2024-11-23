@@ -72,9 +72,9 @@ local the_man_image_table = gfx.imagetable.new("images/theman")
 local poster_complete_image_table = gfx.imagetable.new("images/poster-complete-1")
 
 -- initialize music
-local main_theme = playdate.sound.fileplayer.new('sounds/mobwaretheme')
+local main_theme = playdate.sound.fileplayer.new('sounds/main_theme')
 local victory_music = playdate.sound.fileplayer.new('sounds/victory_theme')
-local defeat_music = playdate.sound.fileplayer.new('sounds/sad_trombone')
+local defeat_music = playdate.sound.fileplayer.new('sounds/lose_sound')
 
 -- initialize sound effects for menu
 local click_sound_1 = playdate.sound.sampleplayer.new('sounds/click1')
