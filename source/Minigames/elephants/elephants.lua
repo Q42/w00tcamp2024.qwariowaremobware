@@ -35,8 +35,12 @@ local elephantTimers = {}
 local numElephants = 5
 local allTimersDone = false
 for i = 1, numElephants do
+  local xOffset = math.random(-20, 20) -- Random x offset between -20 and 20
+  local yOffset = math.random(-10, 10) -- Random y offset between -10 and 10
   local elephantSprite = gfx.sprite.new(elephantImage)
-  elephantSprite:moveTo(500 + (i * 75), 180)
+  elephantSprite:moveTo(500 + (i * 75) + xOffset, 180 + yOffset)
+  local elephantSprite = gfx.sprite.new(elephantImage)
+  elephantSprite:moveTo(500 + (i * 75) + xOffset, 180 + yOffset)
   elephantSprite:add()
   table.insert(elephantSprites, elephantSprite)
 end
