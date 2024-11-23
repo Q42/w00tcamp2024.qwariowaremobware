@@ -81,8 +81,6 @@ finish_sprite:setScale(0.5) -- Scale the sprite to 50% of its original size
 finish_sprite:add()
 finish_sprite:setVisible(false)
 
-local finish_position = 400
-
 local dino_sprite = AnimatedSprite.new(dino_image_table)
 dino_sprite:addState("standing", 1, 2, { tickStep = 3, loop = true, nextAnimation = "idle" }, true)
 dino_sprite:addState("walking", 3, 4, { tickStep = 3, loop = true, nextAnimation = "idle" }, true)
@@ -103,9 +101,33 @@ local function doesDinoCollideWithCactus()
     return false;
 end
 
+local function jump()
+    local jumpHeight = 50
+    local jumpDuration = 0.5
+    local originalY = dino_sprite.y
+
+    local jumpUp = playdate.timer.performAfterDelay(jumpDuration * 500, function()
+        dino_sprite:moveTo(dino_sprite.x, originalY - jumpHeight)
+    end)
+
+    local jumpDown = playdate.timer.performAfterDelay(jumpDuration * 1000, function()
+        dino_sprite:moveTo(dino_sprite.x, originalY)
+    end)
+
+    if jumpUp then
+        jumpUp.timerEndedCallback = function()
+            if jumpDown then
+                jumpDown:start()
+            end
+        end
+        jumpUp:start()
+    end
+end;
+
 local dino_position = 50;
 local endgame = false;
 local finished = false;
+local finish_position = 400
 
 internet_startup_sound:play()
 
@@ -140,37 +162,24 @@ function dino_the_game.update()
         end
     end
 
-    if playdate.buttonJustPressed("b") and not finished and not endgame then
+    if playdate.buttonJustPressed("b") and not finished then
+        print("Jumping")
         if mobware.BbuttonIndicator then
             mobware.BbuttonIndicator.stop()
         end
-        -- Jumping :D
-        local jumpHeight = 50
-        local jumpDuration = 0.5
-        local originalY = dino_sprite.y
-
-        local jumpUp = playdate.timer.new(jumpDuration * 1000, function()
-            dino_sprite:moveTo(dino_sprite.x, originalY - jumpHeight)
-        end)
-
-        local jumpDown = playdate.timer.new(jumpDuration * 1000, function()
-            dino_sprite:moveTo(dino_sprite.x, originalY)
-        end)
-
-        jumpUp.timerEndedCallback = function()
-            jumpDown:start()
-        end
-
-        jumpUp:start()
+        jump()
     end
 
     if crankChange > 0 and not finished then
 
-        if not endgame then
+        if finish_position > 300 then
             background_sprite:moveBy(-crankChange, 0)
-        else
+        end
+
+        if endgame then
             dino_sprite:moveBy(crankChange, 0)
         end
+
         dino_position = dino_position + crankChange
         dino_sprite:changeState("walking")
     else
@@ -183,9 +192,6 @@ function dino_the_game.cranked(change, acceleratedChange)
 	if mobware.crankIndicator then
 		mobware.crankIndicator.stop()
 	end
-    if mobware.BbuttonIndicator then
-        mobware.BbuttonIndicator.stop()
-    end
 end
 
 -- Minigame package should return itself
