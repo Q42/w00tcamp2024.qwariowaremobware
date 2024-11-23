@@ -131,21 +131,21 @@ function stickthememe.update()
 			if x >= 80 and x <= 90 then
 				gamestate = 'victory'
 			else
-				gamestate = 'victory'
+				gamestate = 'defeat'
 			end
 		end
 	end
 
 	if gamestate == 'victory' then
 		mobware.AbuttonIndicator.stop()
-		mobware.print("Lekkâh bezag!",200, 120)
+		mobware.print("Lekkâh bezag!")
 		playdate.wait(2000)
 		return 1
 
 	elseif gamestate == 'defeat' then
 		mobware.AbuttonIndicator.stop()
 		gfx.sprite.update() 
-		mobware.print("Jè scheve!",200, 120)
+		mobware.print("Jè scheve!")
 		playdate.wait(2000)	
 		return 0
 
