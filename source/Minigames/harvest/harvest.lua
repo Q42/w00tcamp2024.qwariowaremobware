@@ -55,6 +55,10 @@ local harvest = {}
 -- set initial gamestate and start prompt for player to hit the B button
 local gamestate = 'start'
 
+local duurtLangSound = playdate.sound.sampleplayer.new('Minigames/harvest/sounds/duurt_te_lang')
+local weekendSound = playdate.sound.sampleplayer.new('Minigames/harvest/sounds/weekend')
+local ohOhSound = playdate.sound.sampleplayer.new('Minigames/harvest/sounds/oh-oh')
+
 -- start timer	 
 local MAX_GAME_TIME = 5 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
 local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, function() gamestate = "timeUp" end ) --runs for 8 seconds at 20fps, and 4 seconds at 40fps
@@ -122,16 +126,19 @@ function harvest.update()
 	elseif gamestate == 'victory' then
 		gfx.sprite.update() 
 		mobware.print("HET IS WEEKEND")
+		weekendSound:play()
 		playdate.wait(2000)
 		return 1
 	elseif gamestate == 'defeat' then
 		gfx.sprite.update() 
 		mobware.print("DAT DUURT TE LANG")
+		duurtLangSound:play()
 		playdate.wait(2000)	
 		return 0
 	elseif gamestate == 'timeUp' then
 		gfx.sprite.update() 
 		mobware.print("TE LAAT, JE PL IS BOOS")
+		ohOhSound:play()
 		playdate.wait(2000)	
 		return 0
 	end
