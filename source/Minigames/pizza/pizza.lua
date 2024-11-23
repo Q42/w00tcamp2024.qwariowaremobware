@@ -26,6 +26,8 @@ end
 
 -- all of the code here will be run when the minigame is loaded, so here we'll initialize our graphics and variables:
 local gfx <const> = playdate.graphics
+local snd = playdate.sound
+
 
 -- Define name for minigame package -> should be the same name as the name of the folder and name of <minigame>.lua 
 local pizza = {}
@@ -54,6 +56,8 @@ local fire_spritesheet = gfx.imagetable.new("Minigames/pizza/images/fire")
 local bram_blij = gfx.image.new("Minigames/pizza/images/dither_it_bram_blij")
 local bram_rug = gfx.image.new("Minigames/pizza/images/dither_it_bram_rug")
 local victory_noise = playdate.sound.sampleplayer.new('Minigames/pizza/sounds/pizza_calzone')
+local bgMusic = playdate.sound.sampleplayer.new("Minigames/pizza/sounds/pizzatune")
+bgMusic:play(0)
 
 -- Variable to store the time of the previous frame
 local previousTime = playdate.getCurrentTimeMilliseconds()
