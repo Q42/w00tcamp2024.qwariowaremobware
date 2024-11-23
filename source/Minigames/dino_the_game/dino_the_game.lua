@@ -48,6 +48,7 @@ for _, cactus in ipairs(cactuses) do
         local cactus_sprite = gfx.sprite.new(cactus_image)
         cactus_sprite:moveTo(cactus.x, cactus.y)
         cactus_sprite:add()
+        cactus_sprite:setZIndex(10)
         table.insert(cactus_sprites, { sprite = cactus_sprite, x = cactus.x, y = cactus.y })
     else
         print("Error loading cactus image: " .. cactus.image)
