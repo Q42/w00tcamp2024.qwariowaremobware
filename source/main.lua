@@ -8,7 +8,7 @@
 ]]
 
 -- variables for use with testing/debugging:
--- DEBUG_GAME = "dino_the_game" --> Set "DEBUG_GAME" variable to the name of a minigame and it'll be chosen every time!
+DEBUG_GAME = "touchy" --> Set "DEBUG_GAME" variable to the name of a minigame and it'll be chosen every time!
 --SET_FRAME_RATE = 40 --> as the name implies will set a framerate. Used for testing minigames at various framerates
 
 -- Import CoreLibs
@@ -92,6 +92,10 @@ function initialize_metagame()
 	games_won = 0
 	games_lost = 0
 	lose_guage = 0
+	if game_start_timer ~= nil then
+		game_start_timer:remove()
+	end
+	game_start_timer = nil
 	-- if DEBUG_GAME is set then jump right into the action!
 	if DEBUG_GAME then
 		GameState = 'initialize'
@@ -182,7 +186,7 @@ function playdate.update()
 		-- call minigame's update function
 		game_result = minigame.update()
 		--> minigame update function should return 1 if the player won, and 0 if the player lost
-
+	
 		-- move to "transition" gamestate if the minigame is over
 		if game_result == 0 or game_result == 1 or game_result == 2 then
 			GameState = 'transition'
@@ -315,8 +319,6 @@ function playdate.update()
 				end
 			end)
 		end
-
-
 		GameState = 'transition'
 	elseif GameState == 'game_won' then
 		pcall(minigame_cleanup)
