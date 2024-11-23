@@ -142,19 +142,25 @@ function uurtjefactuurtje.update()
 	if gamestate == 'start' then
 
 	elseif gamestate == 'victory' then
-		mobware.print("SUPER")
+		mobware.print("NICE")
+		local goedSound = snd.sampleplayer.new("Minigames/minigame_kunstofweg/sounds/nice.wav")
+		goedSound:play(1)
 		playdate.wait(2000)
 		return 1
 
 	elseif gamestate == 'defeat' then
 		gfx.sprite.update() 
 		mobware.print("DUUR GRAPJE")
+		local foutSound = snd.sampleplayer.new("Minigames/uurtjefactuurtje/sounds/duurgrapje.wav")
+		foutSound:play(1)
 		playdate.wait(2000)	
 		return 0
 
 	elseif gamestate == 'timeUp' then
 		gfx.sprite.update() 
 		mobware.print("TE LAAT")
+		local telaatSound = snd.sampleplayer.new("Minigames/uurtjefactuurtje/sounds/telaat.wav")
+		telaatSound:play(1)
 		playdate.wait(2000)	
 		return 0
 	end
