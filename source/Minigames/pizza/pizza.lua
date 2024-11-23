@@ -61,12 +61,13 @@ local MAX_GAME_TIME = 5 -- define the time at 20 fps that the game will run betf
 	--> after <MAX_GAME_TIME> seconds (at 20 fps) will set "defeat" gamestate
 	--> I'm using the frame timer because that allows me to increase the framerate gradually to increase the difficulty of the minigame
 
-local isFlipped
+local numberOfSlices = 6
 
 local aButton = makeCustomButton('a')
 local bButton = makeCustomButton('b')
 
 local pizza_image = gfx.image.new("Minigames/pizza/images/pizza")
+local checkmark_image = gfx.image.new("Minigames/pizza/images/checkmark")
 -- local pizza_sprite = gfx.sprite.new(pizza_image)
 
 function pizza.setUp()
@@ -89,12 +90,10 @@ pizza.setUp()
 
 function pizza.drawPizza()
 	assert(pizza_image, "pizza_image is nil")
+	assert(checkmark_image, "checkmark_image is nil")
 
 	-- Clear the screen
 	playdate.graphics.clear()
-
-	-- Get the image dimensions
-    local width, height = pizza_image:getSize()
 
 	-- Define the parameters for drawSampled
     local z = 100 -- Depth (not typically used in 2D)
@@ -117,17 +116,41 @@ function pizza.drawPizza()
 	local jHatX = -math.sin(crankAngle) * 1.1
 	local jHatY = math.cos(crankAngle) * 1.1
 
+	local x, y, width, height = 80 - 80, -40, 240 + 80, 280
+
     -- Draw the sampled image
-	-- pizza_image:draw(100, 100)
-    pizza_image:drawSampled(80, 0, width, height, -- x, y, width, height
-						0.5, 0.5, -- center x, y
-						iHatX, jHatX,-- dxx, dyx
-						iHatY, jHatY, -- dxy, dyy
-						0.5, 0.5, -- dx, dy
-						500, -- z
-						45, -- tilt angle
-						false -- tile
-					)
+    pizza_image:drawSampled(
+		x, y, width, height, -- x, y, width, height
+		0.5, 0.5, -- center x, y
+		iHatX, jHatX,-- dxx, dyx
+		iHatY, jHatY, -- dxy, dyy
+		0.5, 0.5, -- dx, dy
+		500, -- z
+		45, -- tilt angle
+		false -- tile
+	)
+
+	for i = 1, numberOfSlices do
+		local angle = crankAngle + (i-1) * 2 * math.pi / numberOfSlices
+
+		local iHatX = math.cos(angle) -- * 1.1
+		local iHatY = math.sin(angle) -- * 1.1
+		local jHatX = -math.sin(angle) -- * 1.1
+		local jHatY = math.cos(angle) -- * 1.1
+
+		-- local width, height = checkmark_image:getSize()
+
+		checkmark_image:drawSampled(
+			x, y, width, height, -- x, y, width, height
+			0.5, 0.5, -- center x, y
+			iHatX, jHatX,-- dxx, dyx
+			iHatY, jHatY, -- dxy, dyy
+			0.5, -3.6, -- dx, dy
+			500, -- z
+			45, -- tilt angle
+			false -- tile
+		)
+	end
 
 	-- field:drawSampled(0, 70, 200, 50,  -- x, y, width, height
 	-- 				0.5, 0.95, -- center x, y
