@@ -72,11 +72,10 @@ local coin7_noise = playdate.sound.sampleplayer.new('Minigames/pliepos/sounds/co
 local gamestate = 'start'
 
 -- start timer	 
-local MAX_GAME_TIME = 20 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
-local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, function() gamestate = "timeUp" end ) --runs for 8 seconds at 20fps, and 4 seconds at 40fps
-	--> after <MAX_GAME_TIME> seconds (at 20 fps) will set "defeat" gamestate
-	--> I'm using the frame timer because that allows me to increase the framerate gradually to increase the difficulty of the minigame
-
+local MAX_GAME_TIME = 25 -- define the time at 20 fps that the game will run before setting the "defeat"gamestate
+local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, 0.0, 1.0)
+game_timer.timerEndedCallback = function() gamestate = "defeat" end	--> after <MAX_GAME_TIME> seconds (at 20 fps) will set "defeat" gamestate
+game_timer.updateCallback = function() mobware.timer.setGameProgress(game_timer.value) end
 local exchangePliepos = 0
 local exchangeCareokas = 0
 local offeredPliepos = 0
@@ -128,6 +127,8 @@ function pliepos.setUp()
 
 	okButton:moveTo(275,205)
 	plusOneButton:moveTo(364,205)
+
+	mobware.timer.sprite:add()
 
 	do
 		-- generate random int between 1 & 4
