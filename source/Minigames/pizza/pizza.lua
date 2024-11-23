@@ -27,25 +27,6 @@ end
 -- all of the code here will be run when the minigame is loaded, so here we'll initialize our graphics and variables:
 local gfx <const> = playdate.graphics
 
-local function makeCustomButton(name)
-	local path
-
-	if name == 'a' then
-		path = "images/A-button"
-	elseif name == 'b' then
-		path = "images/B-button"
-	else 
-		assert(false, "Invalid button name")
-	end
-
-	local spritesheet = gfx.imagetable.new(path)
-	local sprite = AnimatedSprite.new(spritesheet)
-	sprite:addState("mash",1,6, {tickStep = 2}, true)
-	sprite:setZIndex(1000)
-	sprite:setIgnoresDrawOffset(true)
-	return sprite
-end
-
 -- Define name for minigame package -> should be the same name as the name of the folder and name of <minigame>.lua 
 local pizza = {}
 
@@ -62,28 +43,18 @@ local MAX_GAME_TIME = 5 -- define the time at 20 fps that the game will run betf
 	--> I'm using the frame timer because that allows me to increase the framerate gradually to increase the difficulty of the minigame
 
 local numberOfSlices = 6
-
-local aButton = makeCustomButton('a')
-local bButton = makeCustomButton('b')
+-- array with float values between 0 and 1
+local slicesStates = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }
 
 local pizza_image = gfx.image.new("Minigames/pizza/images/pizza")
-local checkmark_image = gfx.image.new("Minigames/pizza/images/checkmark")
--- local pizza_sprite = gfx.sprite.new(pizza_image)
+local checkmark_image = gfx.image.new("Minigames/pizza/images/checkmark-filled")
+local checkmark_spritesheet = gfx.imagetable.new("Minigames/pizza/images/checkmark-filling")
+
+-- Variable to store the time of the previous frame
+local previousTime = playdate.getCurrentTimeMilliseconds()
 
 function pizza.setUp()
     print("setUp called.")
-	isFlipped = math.random() < 0.5
-	
-	-- pizza_sprite:moveTo(200, 120)
-	-- pizza_sprite:add()
-
-	if isFlipped then
-		aButton:moveTo(36 + 72, 240 - 36 - 16)
-		bButton:moveTo(364 - 72, 240 - 36 - 16)
-	else 
-		bButton:moveTo(36 + 72, 240 - 36 - 16)
-		aButton:moveTo(364 - 72, 240 - 36 - 16)
-	end
 end
 
 pizza.setUp()
@@ -91,6 +62,7 @@ pizza.setUp()
 function pizza.drawPizza()
 	assert(pizza_image, "pizza_image is nil")
 	assert(checkmark_image, "checkmark_image is nil")
+	assert(checkmark_spritesheet, "checkmark_spritesheet is nil")
 
 	-- Clear the screen
 	playdate.graphics.clear()
@@ -99,16 +71,10 @@ function pizza.drawPizza()
     local z = 100 -- Depth (not typically used in 2D)
     local tiltAngle = 20 -- Tilt angle in degrees
 
-    -- Get the current time in milliseconds
-	local currentTime = playdate.getCurrentTimeMilliseconds()
-
-	-- Calculate a sine wave value based on the current time
-	-- Adjust the frequency and amplitude as needed
-	local frequency = 0.0001 -- Frequency of the sine wave
-	local amplitude = 45 -- Amplitude of the sine wave
-	local sineValue = math.sin(currentTime * frequency) * amplitude
-	tiltAngle = sineValue
-	print("tiltAngle", tiltAngle)
+	-- local currentTime = playdate.getCurrentTimeMilliseconds()
+	-- local frequency = 0.0001 -- Frequency of the sine wave
+	-- local amplitude = 45 -- Amplitude of the sine wave
+	-- local sineValue = math.sin(currentTime * frequency) * amplitude
 
 	local crankAngle = playdate.getCrankPosition() / 360 * (2 * math.pi) 
 	local iHatX = math.cos(crankAngle) * 1.1
@@ -129,7 +95,6 @@ function pizza.drawPizza()
 		45, -- tilt angle
 		false -- tile
 	)
-
 	for i = 1, numberOfSlices do
 		local angle = crankAngle + (i-1) * 2 * math.pi / numberOfSlices
 
@@ -138,9 +103,19 @@ function pizza.drawPizza()
 		local jHatX = -math.sin(angle) -- * 1.1
 		local jHatY = math.cos(angle) -- * 1.1
 
-		-- local width, height = checkmark_image:getSize()
+		local image
+		if slicesStates[i] >= 1.0 then
+			image = checkmark_image
+		else 
+			-- select correct progress checkmark image from image table bases on slicesStates[i] so we can use it for drawSampled
+			local index = math.floor(slicesStates[i] * 25) + 1
+			index = math.min(index, 25)
+			image = checkmark_spritesheet:getImage(index)
+			local assertionMessage = "image is nil, could not load, i: " .. i .. ", slicesStates[i]: " .. slicesStates[i] .. ", index: " .. index
+			assert(image, assertionMessage)
+		end
 
-		checkmark_image:drawSampled(
+		image:drawSampled(
 			x, y, width, height, -- x, y, width, height
 			0.5, 0.5, -- center x, y
 			iHatX, jHatX,-- dxx, dyx
@@ -171,38 +146,56 @@ function pizza.update()
 
 	pizza.drawPizza()
 
-	
 	-- update timer
-	-- playdate.frameTimer.updateTimers()
+	playdate.frameTimer.updateTimers()
 
-	if playdate.buttonJustPressed(playdate.kButtonA) then
-		if not isFlipped then
-			gamestate = 'victory'
-		else
-			gamestate = 'defeat'
+	-- Get the current time
+	local currentTime = playdate.getCurrentTimeMilliseconds()
+	local deltaTime = (currentTime - previousTime) / 1000
+	previousTime = currentTime
+	
+	-- Print deltaTime to the console for debugging
+	print("Delta Time: " .. deltaTime)
+
+	local selectedSliceIndex = math.floor((1 - ((playdate.getCrankPosition() - 180 / numberOfSlices) / 360)) * numberOfSlices) + 1
+	
+	print(selectedSliceIndex)
+	if selectedSliceIndex > numberOfSlices then
+		selectedSliceIndex = 1
+	end
+	print(selectedSliceIndex)
+	
+	-- increment slice value by dt
+	for i = 1, numberOfSlices do
+		if i == selectedSliceIndex then
+			slicesStates[i] = math.min(slicesStates[i] + deltaTime / 2, 1.0)
+		elseif  slicesStates[i] < 1.0 then
+			slicesStates[i] = math.max(slicesStates[i] - deltaTime / 6, 0.0)
 		end
-		
 	end
 
-	if playdate.buttonJustPressed(playdate.kButtonB) then
-		if isFlipped then
+	-- determine win condition
+	local allSlicesBaked = true
+	-- local isSliceBurned = false // TO DO
+
+	do 
+		for i = 1, numberOfSlices do
+			if slicesStates[i] < 1.0 then
+				allSlicesBaked = false
+				break
+			end
+		end
+
+		if allSlicesBaked then
 			gamestate = 'victory'
-		else
-			gamestate = 'defeat'
 		end
 	end
-
-	if gamestate == 'start' then
-	else 
-		aButton:remove()
-		bButton:remove()
-	end 
 
 	if gamestate == 'start' then
 		-- do nothing
 	elseif gamestate == 'victory' then
 		gfx.sprite.update() 
-		mobware.print("HET IS WEEKEND")
+		mobware.print("DAT RUIKT HEERLIJK")
 		playdate.wait(2000)
 		return 1
 	elseif gamestate == 'defeat' then
@@ -212,7 +205,7 @@ function pizza.update()
 		return 0
 	elseif gamestate == 'timeUp' then
 		gfx.sprite.update() 
-		mobware.print("TE LAAT, JE PL IS BOOS")
+		mobware.print("WAT DUURT DAT LANG")
 		playdate.wait(2000)	
 		return 0
 	end
