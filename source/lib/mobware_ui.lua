@@ -27,7 +27,7 @@ end
 -- "A" button indicator
 local Abutton_spritesheet = gfx.imagetable.new("images/A-button")
 mobware.AbuttonIndicator = {}
-function mobware.AbuttonIndicator.start()
+function mobware.AbuttonIndicator.start(x,y)
 	mobware.AbuttonIndicator.AbuttonIndicator_sprite = AnimatedSprite.new( Abutton_spritesheet )
 	mobware.AbuttonIndicator.AbuttonIndicator_sprite:addState("mash",1,6, {tickStep = 2}, true )
 	mobware.AbuttonIndicator.AbuttonIndicator_sprite:moveTo(364,205)
