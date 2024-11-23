@@ -8,7 +8,7 @@
 ]]
 
 -- variables for use with testing/debugging:
--- DEBUG_GAME = "threading_needle" --> Set "DEBUG_GAME" variable to the name of a minigame and it'll be chosen every time!
+-- DEBUG_GAME = "dino_the_game" --> Set "DEBUG_GAME" variable to the name of a minigame and it'll be chosen every time!
 --SET_FRAME_RATE = 40 --> as the name implies will set a framerate. Used for testing minigames at various framerates
 
 -- Import CoreLibs
@@ -204,7 +204,7 @@ function playdate.update()
 				time_scaler = time_scaler + 1
 			end
 			-- animation for the pasting man
-		
+
 			the_man_sprite = AnimatedSprite.new(the_man_image_table)
 			the_man_sprite:addState("animate", 1, 4, { tickStep = 3, loop = true, nextAnimation = "idle" }, true)
 			the_man_sprite:moveTo(200, 120)
@@ -262,7 +262,7 @@ function playdate.update()
 			end
 
 
-			
+
 
 
 		end
@@ -300,7 +300,7 @@ function playdate.update()
 		building:moveTo(200, 120)
 		-- building:setZIndex(2)
 		building:changeState("hoist")
-		
+
 		endgameText = "You lost!"
 		if restartTimer == nil then
 			print("starting restart timer")
@@ -345,7 +345,7 @@ function playdate.update()
 		endgameText = "You won!"
 		GameState = 'transition'
 	end
-	
+
 	-- Added for debugging
 	playdate.drawFPS()
 end
