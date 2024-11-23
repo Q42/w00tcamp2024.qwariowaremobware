@@ -25,8 +25,8 @@ title_sprite:add()
 
 local handThreadSprite = gfx.sprite.new(gfx.image.new("Minigames/threading_needle/images/hand_with_thread"))
 local needleSprite = gfx.sprite.new(gfx.image.new("Minigames/threading_needle/images/needle"))
-handThreadSprite:setCollideRect(0, 0, 10, 10)
-needleSprite:setCollideRect(0, 0, 10, 10)
+handThreadSprite:setCollideRect(0, 20, 10, 10)
+needleSprite:setCollideRect(0, 0, 10, 20)
 handThreadSprite:moveTo(250, 120)
 needleSprite:moveTo(100, 120)
 
@@ -78,6 +78,9 @@ function threading_needle.update()
 		local accX = curAccX - neutralAccX
 		local accY = curAccY - neutralAccY
 		handThreadSprite:moveBy(accX*5, accY*5)
+		if #handThreadSprite:overlappingSprites() > 0 then
+			gamestate = "victory"
+		end
 	elseif gamestate == 'victory' then
 		-- The "victory" gamestate will simply show the victory animation and then end the minigame
 
