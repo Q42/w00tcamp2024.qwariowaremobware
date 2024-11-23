@@ -62,6 +62,12 @@ function uurtjefactuurtje.setUp()
 	mobware.BbuttonIndicator.start()
 	mobware.AbuttonIndicator.AbuttonIndicator_sprite:moveTo(350, 200)
 	mobware.BbuttonIndicator.BbuttonIndicator_sprite:moveTo(75, 200)
+
+	print "uurtje factuurtje setup"
+	mobware.timer.setColor("white")
+	mobware.timer.sprite:add()
+
+
 	if backgroundState == true then
 	 	bgPath = "Minigames/uurtjefactuurtje/images/bg2" --richard
 	else
@@ -101,9 +107,6 @@ function uurtjefactuurtje.update()
 
 	bannerSprite:moveTo(200,50)
 	bannerSprite:add()
-
-	mobware.timer.sprite:add()
-
 
 	-- update timer
 	playdate.frameTimer.updateTimers()
