@@ -15,6 +15,7 @@ mobware.timer.setPosition("bottomLeft")
 mobware.timer.sprite:add()
 
 local MAX_GAME_TIME = 12 -- define the time at 20 fps that the game will run betfore setting the "defeat"gamestate
+local gamestate = ""
 local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, 0.0, 1.0)
 game_timer.timerEndedCallback = function() gamestate = "defeat" end
 
@@ -71,7 +72,7 @@ function elephants.update()
   print("mic level: " .. micLevel)
   -- Check if the microphone input level is above the threshold
   if micLevel > MIC_THRESHOLD then
-    state = "done"    
+    state = "done"
     elephants.PlayYay()
     print("You scared the elephants away!")
     drawText("You scared the elephants away!", 0, 0)
@@ -98,7 +99,7 @@ function elephants.update()
     elephants.PlayElephant()
     print("The elephants are still here!")
     playdate.sound.micinput.stopListening()
-    
+
     drawText("The elephants are attacking!", 0, 0)
     local allTimersDone = true
     -- Animate the elephant sprites moving to the left using timers

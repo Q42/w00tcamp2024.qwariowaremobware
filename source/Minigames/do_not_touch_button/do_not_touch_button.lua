@@ -42,6 +42,7 @@ local function isButtonPressed()
 end
 
 -- start timer
+local gamestate = ""
 local MAX_GAME_TIME = 5 -- define the time at 20 fps that the game will run betfore setting the "defeat" gamestate
 local game_timer = playdate.frameTimer.new(MAX_GAME_TIME * 20, function() gamestate = "mission_passed" end)
 --> after <MAX_GAME_TIME> seconds (at 20 fps) will move to "defeat" gamestate

@@ -24,7 +24,8 @@ pd_sprite.frame = 1
 pd_sprite.crank_counter = 0
 pd_sprite.done = false
 
--- start timer 
+-- start timer
+local gamestate = ""
 local MAX_GAME_TIME = 8 -- define the time at 20 fps that the game will run betfore setting the "defeat" gamestate
 local game_timer = playdate.frameTimer.new( MAX_GAME_TIME * 20, 0.0, 1.0)
 game_timer.timerEndedCallback = function() gamestate = "defeat" end
@@ -36,7 +37,7 @@ mobware.timer.sprite:add()
 function jira.update()
 	-- update sprite animations
 	gfx.sprite.update() -- updates all sprites
-	
+
 	-- update frame timer
 	playdate.frameTimer.updateTimers()
 
@@ -53,17 +54,17 @@ function jira.update()
 	end
 
 	-- Loss condition
-	if gamestate == "defeat" then 
+	if gamestate == "defeat" then
 		-- if player has lost, show images of playdate running out of power then exit
 		local playdate_low_battery_image = gfx.image.new("Minigames/jira/images/burndown.png")
 		local low_battery = gfx.sprite.new(playdate_low_battery_image)
 		low_battery:moveTo(200, 120)
 		low_battery:addSprite()
-		gfx.sprite.update() 
+		gfx.sprite.update()
 
 		-- wait another 2 seconds then exit
 		playdate.wait(2000)	-- Pause 2s before ending the minigame
-		return 0 -- returning 0 to indicate that the player has lost and exit the minigame 
+		return 0 -- returning 0 to indicate that the player has lost and exit the minigame
 	end
 end
 
