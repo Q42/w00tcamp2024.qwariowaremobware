@@ -68,7 +68,7 @@ mobware.DpadIndicator = {}
 
 -- if no inputs are given, d-pad indicator shows D-pad moving in a circle
 function mobware.DpadIndicator.start(direction1, direction2)
-	mobware.DpadIndicator_sprite = AnimatedSprite.new(Dpad_spritesheet)	
+	mobware.DpadIndicator_sprite = AnimatedSprite.new(Dpad_spritesheet)
 
 	-- if no inputs are given, d-pad indicator shows D-pad moving in a circle
 	mobware.DpadIndicator_sprite:addState("circle",2,5, {tickStep = 3}, true)
@@ -100,9 +100,9 @@ mobware.AccelerometerIndicator = {}
 
 -- if no inputs are given, d-pad indicator shows D-pad moving in a circle
 function mobware.AccelerometerIndicator.start(direction1, direction2)
-	mobware.AccelerometerIndicator_sprite = AnimatedSprite.new(Accelerometer_spritesheet )	
+	mobware.AccelerometerIndicator_sprite = AnimatedSprite.new(Accelerometer_spritesheet )
 
-	-- if no inputs are given, indicator shows playdate moving in every direction 
+	-- if no inputs are given, indicator shows playdate moving in every direction
 	--mobware.AccelerometerIndicator_sprite:addState("circle",2,5, {tickStep = 3}, true)
 	--mobware.AccelerometerIndicator_sprite:addState("circle",nil,nil, {tickStep = 4, frames = {2,1,3,1,4,1,5,1}}, true)
 	mobware.AccelerometerIndicator_sprite:addState("circle",nil,nil, {tickStep = 3, frames = {3,1,5,1,2,1,4,1}}, true)
@@ -189,7 +189,7 @@ end
 
 function mobware.timer.setPosition(pos)
 	if pos == "topLeft" then
-		mobware.timer.sprite:moveTo(18, 10)
+		mobware.timer.sprite:moveTo(20, 30)
 	elseif pos == "topRight" then
 		mobware.timer.sprite:moveTo(381, 26)
 	elseif pos == "bottomLeft" then
@@ -207,7 +207,7 @@ function mobware.timer.setColor(color)
 		q_timer_spritesheet = q_timer_spritesheet_white
 	end
 	mobware.timer.sprite:setImage(q_timer_spritesheet:getImage(1))
-	
+
 end
 
 function mobware.timer.reset()

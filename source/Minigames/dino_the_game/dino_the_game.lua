@@ -34,6 +34,10 @@ local background_sprite = gfx.sprite.new(background_image)
 background_sprite:moveTo(1200, 200)
 background_sprite:add()
 
+-- Q loading
+mobware.timer.setPosition("topLeft")
+mobware.timer.sprite:add()
+
 -- Load cactusses
 local cactuses = {
     { image = "Minigames/dino_the_game/images/smoll_cactus.png", x = 400, y = 180, },
@@ -151,14 +155,17 @@ end
 -- start timer
 local MAX_GAME_TIME = 20 -- define the time at 20 fps that the game will run betfore setting the "defeat" gamestate
 local game_state = "running"
-local game_timer = playdate.frameTimer.new(MAX_GAME_TIME * 20, function() game_state = "defeat" end)
+local game_timer = playdate.frameTimer.new(MAX_GAME_TIME * 20, 0.0, 1.0)
+game_timer.timerEndedCallback = function() game_state = "defeat" end
 --> after <MAX_GAME_TIME> seconds (at 20 fps) will move to "defeat" gamestate
 function dino_the_game.update()
     gfx.sprite.update()
     playdate.frameTimer.updateTimers()
+    mobware.timer.setGameProgress(game_timer.value)
 
     if doesDinoCollideWithCactus() then
         cry_sound:play()
+        mobware.print("DAT IS NIET HANDIG HÉ")
         playdate.wait(1000)
         return 0
     end
@@ -174,6 +181,7 @@ function dino_the_game.update()
         if finish_position <= 300 then
             if dino_position >= 2050 then
                 finished = true
+                mobware.print("FINISHED!")
                 finish_sound:play()
                 playdate.wait(1300)
                 return 1;
@@ -229,6 +237,7 @@ function dino_the_game.update()
 
     if game_state == "defeat" then
         cry_sound:play()
+        mobware.print("MET DIT TEMPO RED JE HET NIET")
         playdate.wait(1700)
         return 0
     end
