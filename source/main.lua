@@ -306,9 +306,13 @@ function playdate.update()
 			print("starting restart timer")
 			restartTimer = playdate.frameTimer.performAfterDelay(120, function()
 				initialize_metagame()
-				GameState = 'initialize'
+				GameState = 'start'
 				restartTimer = nil
 				endgameText = ""
+				if building then
+					building:remove()
+					building = nil
+				end
 			end)
 		end
 
@@ -337,9 +341,13 @@ function playdate.update()
 			print("starting restart timer")
 			restartTimer = playdate.frameTimer.performAfterDelay(120, function()
 				initialize_metagame()
-				GameState = 'initialize'
+				GameState = 'start'
 				endgameText = ""
 				restartTimer = nil
+				if building then
+					building:remove()
+					building = nil
+				end
 			end)
 		end
 		endgameText = "You won!"
@@ -473,13 +481,11 @@ function checkEndGame()
 		-- after 2000ms
 		print("game over!")
 		GameState = 'game_over'
-		-- showBuilding(eidra_building)
 
 	end
 
 	if lose_guage <= 0 and time_scaler >= 10 then
 		print("game won!")
 		GameState = 'game_won'
-		-- showBuilding(q_building)
 	end
 end
