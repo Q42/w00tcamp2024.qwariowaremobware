@@ -48,7 +48,7 @@ local poster_complete_sprite
 local games_won = 0
 local games_lost = 0
 local lose_guage = 0;
-local max_lose_guage = 0
+local max_lose_guage = 4
 local game_start_timer
 local the_man_sprite
 local poster_complete_sprite
