@@ -8,7 +8,7 @@
 ]]
 
 -- variables for use with testing/debugging:
--- DEBUG_GAME = "elephants" --> Set "DEBUG_GAME" variable to the name of a minigame and it'll be chosen every time!
+DEBUG_GAME = "uurtjefactuurtje" --> Set "DEBUG_GAME" variable to the name of a minigame and it'll be chosen every time!
 --SET_FRAME_RATE = 40 --> as the name implies will set a framerate. Used for testing minigames at various framerates
 
 -- Import CoreLibs
@@ -27,7 +27,7 @@ import "CoreLibs/easing"
 
 -- Import supporting libraries
 import 'lib/AnimatedSprite' --used to generate animations from spritesheet
-import 'lib/AnimatedImage' --used to generate animations from images
+import 'lib/AnimatedImage'  --used to generate animations from images
 import 'lib/mobware_ui'
 import 'lib/mobware_utilities'
 
@@ -50,6 +50,9 @@ local games_lost = 0
 local lose_guage = 0;
 local max_lose_guage = 4
 local game_start_timer
+local the_man_sprite
+local poster_complete_sprite
+
 -- generate table of minigames and bonus games
 minigame_blocklist = { "hello_world", "minigame_template" }
 minigame_list = generate_minigame_list("Minigames/", minigame_blocklist)
@@ -70,6 +73,8 @@ local playdate_spritesheet = gfx.imagetable.new("images/playdate_spinning")
 local bang_spritesheet = gfx.imagetable.new("images/bang")
 local the_man_image_table = gfx.imagetable.new("images/theman")
 local poster_complete_image_table = gfx.imagetable.new("images/poster-complete-1")
+local eidra_building = gfx.imagetable.new("images/eidra_building")
+local q_building = gfx.imagetable.new("images/q_building")
 
 -- initialize music
 local main_theme = playdate.sound.fileplayer.new('sounds/main_theme')
@@ -107,7 +112,7 @@ function getRandomGame()
 	if game_num == previous_game then
 		return getRandomGame()
 	else
-		previous_game = game_num	
+		previous_game = game_num
 		return game_num
 	end
 end
@@ -167,6 +172,7 @@ function playdate.update()
 			minigame.init()
 		end
 		GameState = 'play'
+		-- showBuilding()
 	elseif GameState == 'play' then
 		playdate.timer.updateTimers()
 		playdate.frameTimer.updateTimers()
@@ -184,21 +190,11 @@ function playdate.update()
 			_minigame_env = nil
 			pcall(minigame_cleanup)
 
-			if game_result == 0 then
-				onGameLost();
-			elseif game_result == 1 then
-				onGameWon();
-				-- TODO: some kind of win state
-
-				-- increase game speed after each successful minigame:
-				time_scaler = time_scaler + 1
-			end
-
 			-- Set up demon sprite for transition animation
 			set_white_background()
 
 			-- animation for the pasting man
-
+		
 			the_man_sprite = AnimatedSprite.new(the_man_image_table)
 			the_man_sprite:addState("animate", 1, 4, { tickStep = 3, loop = true, nextAnimation = "idle" }, true)
 			the_man_sprite:moveTo(200, 120)
@@ -254,6 +250,19 @@ function playdate.update()
 				-- TODO replace with the man
 				-- demon_sprite:changeState("throwing")
 			end
+
+
+			if game_result == 0 then
+				onGameLost();
+			elseif game_result == 1 then
+				onGameWon();
+				-- TODO: some kind of win state
+
+				-- increase game speed after each successful minigame:
+				time_scaler = time_scaler + 1
+			end
+
+
 		end
 	elseif GameState == 'transition' then
 		-- Play transition animation between minigames
@@ -269,29 +278,10 @@ function playdate.update()
 		mobware.print("score: " .. getScore(), 15, 20)
 		gfx.setFont(mobware_default_font) -- reset font to default
 	elseif GameState == 'game_over' then
-		-- TO-DO: UPDATE WITH GAME OVER SEQUENCE
-
-		-- Display game over screen
-		pcall(minigame_cleanup)
-		gfx.clear(gfx.kColorBlack)
-		gfx.setFont(mobware_font_M)
-		mobware.print("GAME OVER!")
-		playdate.wait(4000)
-
-		--reload game from the beginning
-		initialize_metagame()
+		gfx.sprite.update()
 	elseif GameState == 'game_won' then
-		pcall(minigame_cleanup)
-		gfx.clear(gfx.kColorBlack)
-		gfx.setFont(mobware_font_M)
-		mobware.print("You WON!")
-		playdate.wait(1000)
-		mobware.print("You've won " .. games_won .. " games!")
-		playdate.wait(1000)
-		mobware.print("And lost " .. games_lost .. " games...")
-		playdate.wait(2000)
-
-		initialize_metagame()
+		
+		gfx.sprite.update()
 	end
 
 	-- Added for debugging
@@ -420,16 +410,51 @@ function checkEndGame()
 	if lose_guage >= max_lose_guage then
 		-- after 2000ms
 		print("game over!")
-		playdate.frameTimer.performAfterDelay(60, function()
-			GameState = 'game_over'
-		end)
+		GameState = 'game_over'
+		showBuilding(eidra_building)
+
 	end
 
-	if lose_guage <= 0 and time_scaler >= 20 then
+	if lose_guage <= 0 and time_scaler >= 10 then
 		print("game won!")
 		GameState = 'game_won'
-		print("setting gamestate to game_won")
-		
+		showBuilding(q_building)
 	end
-	-- when win?
+end
+
+local restartTimer
+function showBuilding(building_image)
+	print("showing building")
+	pcall(minigame_cleanup)
+	
+	-- remove the man and poster
+	if the_man_sprite then
+		the_man_sprite:remove()
+		the_man_sprite = nil
+	end
+	
+	if poster_complete_sprite then
+		poster_complete_sprite:remove()
+		poster_complete_sprite = nil
+	end
+
+	gfx.clear(gfx.kColorWhite)
+
+	local building = AnimatedSprite.new(building_image)
+	building:addState("idle", 1, 1, { tickStep = 3, loop = true, nextAnimation = "idle" }, true)
+	building:addState("hoist", 2, 9, { tickStep = 7, loop = false, nextAnimation = "hoisted" }, true)
+	building:addState("hoisted", 9, 9, { tickStep = 3, loop = true, nextAnimation = "idle" }, true)
+	building:moveTo(200, 120)
+	-- building:setZIndex(2)
+	building:changeState("hoist")
+	
+
+	if restartTimer == nil then
+		print("starting restart timer")
+		restartTimer = playdate.frameTimer.performAfterDelay(60, function()
+			initialize_metagame()
+			GameState = 'initialize'
+			restartTimer = nil
+		end)
+	end
 end
