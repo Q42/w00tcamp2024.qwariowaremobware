@@ -51,6 +51,8 @@ local numberOfSlices = 5
 local slicesStates = { 0.0, 0.0, 0.0, 0.0, 0.0 } --, 0.0 }
 
 local pizza_image = gfx.image.new("Minigames/pizza/images/pizza")
+local exclamation_mark = gfx.image.new("Minigames/pizza/images/exclamation-mark")
+local is_exclamation_mark_visible = false
 local checkmark_spritesheet = gfx.imagetable.new("Minigames/pizza/images/checkmark-filling")
 local fire_spritesheet = gfx.imagetable.new("Minigames/pizza/images/fire")
 local bram_blij = gfx.image.new("Minigames/pizza/images/dither_it_bram_blij")
@@ -123,25 +125,51 @@ function pizza.drawPizza()
 		local jHatY = math.cos(angle) -- * 1.1
 
 		local image
-		do
+		
+		if slicesStates[i] > 3.0 then
+			local burnFactor = math.min(1, slicesStates[i] - 1) -- value between 0 and 1
+			local elapsedTimeThreshold = 1 - burnFactor
+
+			local time = playdate.getCurrentTimeMilliseconds() / 1000
+			local fraction = math.sin(time * 48) -- * math.sin(playdate.getCurrentTimeMilliseconds()
+			
+			-- -- based on burnFactor and fraction, we can determine which image to show
+			-- local index = math.floor(burnFactor * 25) + 1
+			
+			-- local shouldShowBasedOnTime = fraction % 2 == 1
+			-- local shouldShowBasedBurnFactorFraction = (fraction / 999) < burnFactor
+
+			-- print(i, slicesStates[i], shouldShowBasedOnTime, shouldShowBasedBurnFactorFraction)
+
+			if fraction > 0 then
+				is_exclamation_mark_visible = true
+				image = exclamation_mark
+			else 
+				is_exclamation_mark_visible = false
+			end
+		else
+			is_exclamation_mark_visible = false
+
 			-- select correct progress checkmark image from image table bases on slicesStates[i] so we can use it for drawSampled
 			local index = math.floor(slicesStates[i] * 25) + 1
 			index = math.min(index, 26)
 			image = checkmark_spritesheet:getImage(index)
 			local assertionMessage = "image is nil, could not load, i: " .. i .. ", slicesStates[i]: " .. slicesStates[i] .. ", index: " .. index
-			assert(image, assertionMessage)
 		end
-
-		image:drawSampled(
-			x, y, width, height, -- x, y, width, height
-			0.5, 0.5, -- center x, y
-			iHatX, jHatX,-- dxx, dyx
-			iHatY, jHatY, -- dxy, dyy
-			0.5, -3.6, -- dx, dy
-			500, -- z
-			45, -- tilt angle
-			false -- tile
-		)
+		
+		if image ~= nil then
+			assert(image)
+			image:drawSampled(
+				x, y, width, height, -- x, y, width, height
+				0.5, 0.5, -- center x, y
+				iHatX, jHatX,-- dxx, dyx
+				iHatY, jHatY, -- dxy, dyy
+				0.5, -3.6, -- dx, dy
+				500, -- z
+				45, -- tilt angle
+				false -- tile
+			)
+		end
 	end
 
 	-- draw bram sprite
@@ -180,15 +208,17 @@ function pizza.update()
 	-- increment slice value by dt
 	for i = 1, numberOfSlices do
 		if i == selectedSliceIndex then
-			slicesStates[i] = math.min(slicesStates[i] + deltaTime * 2, 2.0)
-		elseif  slicesStates[i] < 1.0 then
-			slicesStates[i] = math.max(slicesStates[i] - deltaTime, 0.0)
+			slicesStates[i] = math.min(slicesStates[i] + deltaTime * 2, 10.0)
+		elseif slicesStates[i] < 1.0 then
+			slicesStates[i] = math.max(slicesStates[i] - deltaTime * 3, 0.0)
+		else
+			slicesStates[i] = math.max(slicesStates[i] - deltaTime * 2, 1.0)
 		end
 	end
 
 	-- determine win condition
 	local allSlicesBaked = true
-	-- local isSliceBurned = false // TO DO
+	local isSliceBurned = false
 
 	do 
 		for i = 1, numberOfSlices do
@@ -200,6 +230,14 @@ function pizza.update()
 
 		if allSlicesBaked then
 			gamestate = 'victory'
+		end
+	end
+
+	for i = 1, numberOfSlices do		
+		if slicesStates[i] > 8 then
+			isSliceBurned = true
+			gamestate = 'defeat'
+			break
 		end
 	end
 
@@ -221,7 +259,7 @@ function pizza.update()
 		return 1
 	elseif gamestate == 'defeat' then
 		gfx.sprite.update() 
-		mobware.print("DAT DUURT TE LANG")
+		mobware.print("HIJ IS VERBRAND")
 		verbrand_noise:play()
 		bgMusic:stop()
 		playdate.wait(2000)	
