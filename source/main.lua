@@ -8,7 +8,7 @@
 ]]
 
 -- variables for use with testing/debugging:
--- DEBUG_GAME = "elephants" --> Set "DEBUG_GAME" variable to the name of a minigame and it'll be chosen every time!
+DEBUG_GAME = "threading_needle" --> Set "DEBUG_GAME" variable to the name of a minigame and it'll be chosen every time!
 --SET_FRAME_RATE = 40 --> as the name implies will set a framerate. Used for testing minigames at various framerates
 
 -- Import CoreLibs
