@@ -66,20 +66,18 @@ function threading_needle.update()
 
 	-- In the first stage of the minigame, the user needs to hit the "B" button
 	if gamestate == 'title' then
-		needleSprite:add()
-		handThreadSprite:add()
 		gfx.sprite.update()
-		mobware.print("Hold steady!", 100, 200)
+		mobware.print("Get ready, Hold steady!")
 		playdate.display.flush()
 		playdate.wait(1500)
 		neutralAccX, neutralAccY = playdate.readAccelerometer()
 		print("NaccX: " .. neutralAccX .. " NaccY: " .. neutralAccY)
 
-		title_sprite:remove()
+		needleSprite:add()
+		handThreadSprite:add()
 		gamestate = 'playing'
 		mobware.AccelerometerIndicator.start()
 	elseif gamestate == 'playing' then
-		mobware.print("Thread the needle!", 0, 15)
 		local curAccX, curAccY = playdate.readAccelerometer()
 		local accX = curAccX - neutralAccX
 		local accY = curAccY - neutralAccY
