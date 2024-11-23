@@ -102,26 +102,7 @@ local function doesDinoCollideWithCactus()
 end
 
 local function jump()
-    local jumpHeight = 50
-    local jumpDuration = 0.5
-    local originalY = dino_sprite.y
 
-    local jumpUp = playdate.timer.performAfterDelay(jumpDuration * 500, function()
-        dino_sprite:moveTo(dino_sprite.x, originalY - jumpHeight)
-    end)
-
-    local jumpDown = playdate.timer.performAfterDelay(jumpDuration * 1000, function()
-        dino_sprite:moveTo(dino_sprite.x, originalY)
-    end)
-
-    if jumpUp then
-        jumpUp.timerEndedCallback = function()
-            if jumpDown then
-                jumpDown:start()
-            end
-        end
-        jumpUp:start()
-    end
 end;
 
 local dino_position = 50;
@@ -130,10 +111,22 @@ local finished = false;
 local finish_position = 400
 
 internet_startup_sound:play()
+mobware.BbuttonIndicator.start()
+
+-- Jump variables
+local gravity = 0.8
+local jump_velocity = -12
+local dino_y = 175
+local is_jumping = false
+
+local function jump()
+    if not is_jumping then
+        is_jumping = true
+        jump_velocity = -12
+    end
+end
 
 function dino_the_game.update()
-    mobware.BbuttonIndicator.start()
-
     gfx.sprite.update()
     playdate.frameTimer.updateTimers()
 
@@ -162,11 +155,25 @@ function dino_the_game.update()
         end
     end
 
+    -- Handle jumping
+    if is_jumping then
+        dino_y = dino_y + jump_velocity
+        jump_velocity = jump_velocity + gravity
+
+        if dino_y >= 175 then
+            dino_y = 175
+            is_jumping = false
+            jump_velocity = 0
+        end
+
+        dino_sprite:moveTo(50, dino_y)
+    end
+
     if playdate.buttonJustPressed("b") and not finished then
-        print("Jumping")
         if mobware.BbuttonIndicator then
             mobware.BbuttonIndicator.stop()
         end
+        print("Jumping")
         jump()
     end
 
@@ -180,8 +187,13 @@ function dino_the_game.update()
             dino_sprite:moveBy(crankChange, 0)
         end
 
+        if is_jumping then
+            dino_sprite:changeState("standing")
+        else
+            dino_sprite:changeState("walking")
+        end
+
         dino_position = dino_position + crankChange
-        dino_sprite:changeState("walking")
     else
         dino_sprite:changeState("standing")
     end
