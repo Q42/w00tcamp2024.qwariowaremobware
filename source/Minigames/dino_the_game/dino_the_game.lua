@@ -36,9 +36,9 @@ background_sprite:add()
 -- Load cactusses
 local cactuses = {
     { image = "Minigames/dino_the_game/images/smoll_cactus.png", x = 400, y = 180, },
-    { image = "Minigames/dino_the_game/images/big_cactus.png", x = 1000, y = 180, },
-    { image = "Minigames/dino_the_game/images/multiple_cactus.png", x = 1500, y = 180 },
-    { image = "Minigames/dino_the_game/images/smoll_cactus.png",    x = 1900,  y = 180, }
+    { image = "Minigames/dino_the_game/images/big_cactus.png", x = 800, y = 180, },
+    { image = "Minigames/dino_the_game/images/multiple_cactus.png", x = 1300, y = 180 },
+    { image = "Minigames/dino_the_game/images/smoll_cactus.png",    x = 1700,  y = 180, }
 }
 local cactus_sprites = {}
 
