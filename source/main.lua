@@ -8,7 +8,7 @@
 ]]
 
 -- variables for use with testing/debugging:
--- DEBUG_GAME = "invert_binary_tree" --> Set "DEBUG_GAME" variable to the name of a minigame and it'll be chosen every time!
+-- DEBUG_GAME = "minigame_kunstofweg" --> Set "DEBUG_GAME" variable to the name of a minigame and it'll be chosen every time!
 --SET_FRAME_RATE = 40 --> as the name implies will set a framerate. Used for testing minigames at various framerates
 
 -- Import CoreLibs
@@ -72,9 +72,9 @@ local the_man_image_table = gfx.imagetable.new("images/theman")
 local poster_complete_image_table = gfx.imagetable.new("images/poster-complete-1")
 
 -- initialize music
-local main_theme = playdate.sound.fileplayer.new('sounds/mobwaretheme')
+local main_theme = playdate.sound.fileplayer.new('sounds/main_theme')
 local victory_music = playdate.sound.fileplayer.new('sounds/victory_theme')
-local defeat_music = playdate.sound.fileplayer.new('sounds/sad_trombone')
+local defeat_music = playdate.sound.fileplayer.new('sounds/lose_sound')
 
 -- initialize sound effects for menu
 local click_sound_1 = playdate.sound.sampleplayer.new('sounds/click1')
