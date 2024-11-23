@@ -56,6 +56,8 @@ local fire_spritesheet = gfx.imagetable.new("Minigames/pizza/images/fire")
 local bram_blij = gfx.image.new("Minigames/pizza/images/dither_it_bram_blij")
 local bram_rug = gfx.image.new("Minigames/pizza/images/dither_it_bram_rug")
 local victory_noise = playdate.sound.sampleplayer.new('Minigames/pizza/sounds/pizza_calzone')
+local verbrand_noise = playdate.sound.sampleplayer.new('Minigames/pizza/sounds/verbrand')
+local teLaat_noise = playdate.sound.sampleplayer.new('Minigames/pizza/sounds/te_laat')
 local bgMusic = playdate.sound.sampleplayer.new("Minigames/pizza/sounds/pizzatune")
 bgMusic:play(0)
 
@@ -213,17 +215,22 @@ function pizza.update()
 		end
 
 		mobware.print("DAT RUIKT HEERLIJK", nil, 180)
+		bgMusic:stop()
 		victory_noise:play()
 		playdate.wait(3000)
 		return 1
 	elseif gamestate == 'defeat' then
 		gfx.sprite.update() 
 		mobware.print("DAT DUURT TE LANG")
+		verbrand_noise:play()
+		bgMusic:stop()
 		playdate.wait(2000)	
 		return 0
 	elseif gamestate == 'timeUp' then
 		gfx.sprite.update() 
 		mobware.print("WAT DUURT DAT LANG")
+		teLaat_noise:play()
+		bgMusic:stop()
 		playdate.wait(2000)	
 		return 0
 	end
